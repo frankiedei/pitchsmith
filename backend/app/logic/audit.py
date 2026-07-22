@@ -16,29 +16,11 @@ def scan(text: str) -> list[str]:
     return [p for _, p in sorted(hits)]
 
 
-def dewatermark(text: str) -> str:
-    """Always-on backstop for the one AI tell we can fix deterministically without
-    risking meaning: em/en dashes. The model is told not to use them, but it slips,
-    so this runs on EVERY pitch (after the LLM audit too). Newlines are preserved.
-
-    An em dash becomes a comma (the safe general join); an en dash between digits
-    (a date/number range like 10/5–10/22) becomes a hyphen, otherwise a comma."""
-    # en dash inside a numeric range -> hyphen
-    out = re.sub(r"(?<=\d)\s*–\s*(?=\d)", "-", text)
-    # any remaining em/en/horizontal-bar dash, with its surrounding spaces -> ", "
-    out = re.sub(r"\s*[—–―]\s*", ", ", out)
-    # tidy the seams the replacement can leave, per line (keep paragraph breaks)
-    out = re.sub(r"[ \t]{2,}", " ", out)
-    out = re.sub(r"\s+([,.;:!?])", r"\1", out)
-    out = re.sub(r",\s*,", ", ", out)
-    out = re.sub(r",\s*([.!?])", r"\1", out)
-    return out
-
-
 def strip_deterministic(text: str) -> tuple[str, list[str]]:
-    """No-key fallback: remove flagged phrases, strip dashes, tidy the seams. Not
-    as good as the LLM rewrite, but it guarantees the banned list and em dashes
-    never ship. Returns the cleaned text and the phrases that were removed."""
+    """No-key fallback: remove flagged cliché phrases and tidy the seams. Not as
+    good as the LLM rewrite, but it guarantees the banned list never ships.
+    Em dashes and colons are now allowed (the gold examples use them), so this no
+    longer touches punctuation. Returns the cleaned text and phrases removed."""
     removed: list[str] = []
     out = text
     for phrase in BANNED_PHRASES:
@@ -46,8 +28,7 @@ def strip_deterministic(text: str) -> tuple[str, list[str]]:
         if pattern.search(out):
             removed.append(phrase)
             out = pattern.sub("", out)
-    out = dewatermark(out)
-    # collapse the double spaces / dangling punctuation left behind
+    # collapse the double spaces / dangling punctuation the phrase removal leaves
     out = re.sub(r"[ \t]{2,}", " ", out)
     out = re.sub(r"\s+([,.;:])", r"\1", out)
     out = re.sub(r"([,;:])\1+", r"\1", out)

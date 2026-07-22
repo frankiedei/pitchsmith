@@ -15,7 +15,7 @@ function Stars({ n }: { n: number | null }) {
 export function Sidebar() {
   const {
     health, theme, setTheme, artists, selectedArtistId, view,
-    newPitch, selectArtist,
+    newPitch, selectArtist, openGold,
   } = useStore();
 
   return (
@@ -40,6 +40,13 @@ export function Sidebar() {
         onClick={newPitch}
       >
         ＋ New pitch
+      </button>
+      <button
+        className={`btn ghost goldbtn ${view === "gold" ? "active" : ""}`}
+        onClick={openGold}
+        title="The reference pitches every new draft imitates"
+      >
+        ★ Gold pitches
       </button>
 
       <div className="artist-list">

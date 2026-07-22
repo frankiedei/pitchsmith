@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { api } from "../api/client";
 import type {
-  AnalyzeResponse, ArtistDetail, ArtistSummary, FeedbackStatus, GenerateParams,
-  Health, HouseRules, PitchCardT, StylePreset,
+  AnalyzeResponse, ArtistDetail, ArtistSummary, ExemplarT, FeedbackStatus,
+  GenerateParams, Health, HouseRules, PitchCardT, StylePreset,
 } from "../types";
 
 const THEME_KEY = "pitchsmith.theme";
@@ -26,7 +26,7 @@ export interface Toast {
 let toastSeq = 0;
 let learnTimer: number | undefined;
 
-type View = "compose" | "artist";
+type View = "compose" | "artist" | "gold";
 
 const LENGTHS = ["80-120 words", "150-200 words", "250-320 words"];
 
@@ -43,6 +43,11 @@ interface State {
   activeGenerationId: number | null;
   house: HouseRules | null;
   toasts: Toast[];
+
+  // gold-pitch library
+  exemplars: ExemplarT[];
+  loadingExemplars: boolean;
+  addingExemplar: boolean;
 
   // composer
   files: File[];
@@ -71,6 +76,11 @@ interface State {
   selectArtist: (id: number) => Promise<void>;
   refreshArtists: () => Promise<void>;
 
+  openGold: () => Promise<void>;
+  addExemplar: (title: string, text: string, notes: string) => Promise<boolean>;
+  setExemplarActive: (id: number, active: boolean) => Promise<void>;
+  deleteExemplar: (id: number) => Promise<void>;
+
   analyze: () => Promise<void>;
   toggleChip: (i: number) => void;
   addChip: () => void;
@@ -86,6 +96,7 @@ interface State {
     text: string,
     comment?: string,
     editKinds?: string[],
+    rejectReasons?: string[],
   ) => Promise<void>;
   saveArtistRules: (worked: string[], avoid: string[]) => Promise<void>;
   saveHouseRules: (worked: string[], avoid: string[]) => Promise<void>;
@@ -106,6 +117,10 @@ export const useStore = create<State>((set, get) => ({
   activeGenerationId: null,
   house: null,
   toasts: [],
+
+  exemplars: [],
+  loadingExemplars: false,
+  addingExemplar: false,
 
   files: [],
   artistName: "",
@@ -161,6 +176,54 @@ export const useStore = create<State>((set, get) => ({
     try {
       set({ artists: await api.artists() });
     } catch { /* ignore */ }
+  },
+
+  openGold: async () => {
+    if (location.hash) location.hash = "";
+    set({ view: "gold", selectedArtistId: null, loadingExemplars: true, error: null });
+    try {
+      set({ exemplars: await api.exemplars(), loadingExemplars: false });
+    } catch (e) {
+      set({ loadingExemplars: false, error: (e as Error).message });
+    }
+  },
+
+  addExemplar: async (title, text, notes) => {
+    set({ addingExemplar: true });
+    try {
+      const ex = await api.addExemplar({ title, text, notes });
+      set({ exemplars: [ex, ...get().exemplars], addingExemplar: false });
+      get().pushToast("accept", ex.tags.length
+        ? `Gold pitch saved — tagged ${ex.tags.slice(0, 3).join(", ")}`
+        : "Gold pitch saved");
+      return true;
+    } catch (e) {
+      set({ addingExemplar: false });
+      get().pushToast("error", `Couldn't save — ${(e as Error).message}`);
+      return false;
+    }
+  },
+
+  setExemplarActive: async (id, active) => {
+    try {
+      const ex = await api.setExemplarActive(id, active);
+      set({ exemplars: get().exemplars.map((e) => (e.id === id ? ex : e)) });
+      get().pushToast("note", active
+        ? "Back in the library — new pitches can imitate it"
+        : "Benched — kept, but new pitches won't see it");
+    } catch (e) {
+      get().pushToast("error", `Couldn't update — ${(e as Error).message}`);
+    }
+  },
+
+  deleteExemplar: async (id) => {
+    try {
+      await api.deleteExemplar(id);
+      set({ exemplars: get().exemplars.filter((e) => e.id !== id) });
+      get().pushToast("reject", "Gold pitch removed");
+    } catch (e) {
+      get().pushToast("error", `Couldn't delete — ${(e as Error).message}`);
+    }
   },
 
   selectArtist: async (id) => {
@@ -274,7 +337,8 @@ export const useStore = create<State>((set, get) => ({
     setTimeout(() => set({ toasts: get().toasts.filter((t) => t.id !== id) }), 3200);
   },
 
-  sendFeedback: async (card, status, rating, text, comment = "", editKinds = []) => {
+  sendFeedback: async (card, status, rating, text, comment = "", editKinds = [],
+                       rejectReasons = []) => {
     try {
       const res = await api.feedback({
         pitch_option_id: card.id,
@@ -283,6 +347,7 @@ export const useStore = create<State>((set, get) => ({
         rating,
         comment,
         edit_kinds: editKinds,
+        reject_reasons: rejectReasons,
       });
       const detail = get().detail;
       if (detail) {
@@ -317,7 +382,9 @@ export const useStore = create<State>((set, get) => ({
           ? `Edit saved as ${editKinds.join(" + ")} — teaching exactly that`
           : "Edit saved — your changes teach the next drafts");
       } else {
-        push("reject", "Rejected — noted what to avoid from here on");
+        push("reject", rejectReasons.length
+          ? `Rejected (${rejectReasons.join(", ")}) — teaching exactly that`
+          : "Rejected — noted what to avoid from here on");
       }
       get().refreshArtists();
       // the learning summaries recompute in the background on the server;

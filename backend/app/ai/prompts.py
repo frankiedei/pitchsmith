@@ -7,32 +7,36 @@ banned phrases, or extend the few-shot set without touching pipeline code.
 
 # --- Strategic archetypes (the core domain logic) -------------------------
 
-ARCHETYPE_A = "Archetype_A"  # Worldbuilding / Sensory
-ARCHETYPE_B = "Archetype_B"  # Authority / Thesis
+ARCHETYPE_A = "Archetype_A"  # Story & Momentum (emerging)
+ARCHETYPE_B = "Archetype_B"  # Authority & Press (established)
 
 ARCHETYPES = {
     ARCHETYPE_A: {
-        "name": "Worldbuilding / Sensory",
+        "name": "Story & Momentum",
         "when": (
             "Emerging artists with lower traction or credibility, thin press, few "
-            "co-signs. There is a gap where authority would go."
+            "co-signs. The heavy authority material isn't there yet."
         ),
         "fill_with": (
-            "Fill that gap with sensory imagery, vivid figurative language, and "
-            "concrete visual anchors — what the music sounds and looks like, the "
-            "world it builds. Make the reader see and hear it."
+            "Lead with the release itself and the story behind the artist: the "
+            "scene they came up in, their origins and aesthetic, and whatever "
+            "early momentum exists (buzzy singles, a cult following, co-signs, "
+            "tour dates, a first bit of press). Build the credibility case from "
+            "the ground up out of concrete, specific facts, not adjectives."
         ),
     },
     ARCHETYPE_B: {
-        "name": "Authority / Thesis",
+        "name": "Authority & Press",
         "when": (
-            "Established artists with heavy press quotes, notable co-signs, or strong "
-            "metrics. There is leverage to press on."
+            "Established artists with heavy press quotes, notable co-signs, chart "
+            "positions, or strong streaming numbers. There is real leverage to lead "
+            "with."
         ),
         "fill_with": (
-            "Capitalize on leverage points: lead with the strongest press quote or "
-            "co-sign, surface a cultural contradiction the artist embodies, and build "
-            "the pitch around the artist's own thesis statement or quote."
+            "Lead with the strongest credibility: the biggest press quote or "
+            "outlet, the notable co-sign, the chart position, the streaming "
+            "number. Stack the achievements into a case that this artist has "
+            "already arrived and is still climbing."
         ),
     },
 }
@@ -84,126 +88,42 @@ BANNED_PHRASES = [
     "resonates deeply",
 ]
 
-STYLE_RULES = (
-    "House style rules:\n"
-    "- Never use generic PR/AI clichés. Concrete beats abstract every time.\n"
-    "- Describe the actual sound (instruments, tempo, texture, production choices), "
-    "the visual world, or the cultural context — not vague praise.\n"
-    "- Prefer specific nouns and verbs over adjectives. Cut hype words.\n"
-    "- Every claim should be traceable to a fact in the source context or a real "
-    "press quote. Do not invent quotes, outlets, numbers, or co-signs.\n"
-    "- Sound like a sharp human publicist writing to an editor they respect."
-)
-
-# Voice mirroring — the single biggest quality lever. A pitch should carry a
-# subtle echo of the artist's OWN aesthetic and energy (a playful, sensory artist
-# earns slightly warmer, more colourful prose; an austere one stays lean). The
-# guardrail matters as much as the effect: a light touch, never parody.
-VOICE_RULE = (
-    "VOICE - write from INSIDE the artist's world, not from a critic's chair "
-    "outside it. Play a little with their aesthetic and let the prose carry their "
-    "own energy: a sunny, playful artist earns warmth, wit, and a light whimsy; an "
-    "austere one stays spare. Crucially, match their emotional TEMPERATURE. If "
-    "their heartbreak is sweet and summery, keep it sweet and summery. Do NOT "
-    "default to irony, cynicism, menace, or noir darkness unless the artist "
-    "genuinely lives there. A light touch of whimsy is the goal; heavy-handed "
-    "quirk, parody, purple prose, or twee is not. Never trade a concrete fact for a "
-    "flourish, and the pitch must still read as a professional writing to an editor."
-)
-
-# Imagery — the thing the real reference pitches do that AI copy doesn't: reach for
-# the oddly specific sensory detail from the artist's own world.
-IMAGERY_RULE = (
-    "IMAGERY - evoke the artist's visual and sonic world through specific, sensory "
-    "word choice: the colours, textures, tastes, objects, and sounds that belong to "
-    "them. Being a little too specific is a feature, not a bug (\"best served with a "
-    "side of watermelon and ice-cold lemonade\" beats \"summery and refreshing\"; a "
-    "\"mall-bought strawberry Ray-Ban\" beats \"retro sunglasses\"). Reach for the "
-    "concrete noun the artist would use. But do NOT oversaturate: a few precise "
-    "images land harder than a pile of similes, and much of the showing can be plain "
-    "concrete detail, not metaphor. Aim for one or two vivid strokes per paragraph."
-)
-
-# Show, don't tell — the fix for prose that is "too literal": stop narrating the
-# artist's method or how to feel, and render the thing so the reader feels it.
-SHOW_DONT_TELL_RULE = (
-    "SHOW, DON'T TELL - put a concrete image, scene, or sound in front of the "
-    "reader and let THEM draw the conclusion. Do not explain the artist's method, "
-    "intent, or cleverness, and do not tell the reader how to feel or think. "
-    "Ban meta-commentary like \"she sings it through a whimsical lens instead of a "
-    "bitter one\", \"heartbreak isn't a mood, it's a world\", \"the genius move "
-    "is\", or \"the thesis is\". Compare: TELLING is \"her visuals are dreamy and "
-    "inviting\"; SHOWING is \"her visuals glimmer like the opalescent surface of a "
-    "sweltering swimming pool, begging you to jump in\". Render the world; trust the "
-    "image to carry the meaning, and trust the editor to get it."
-)
-
-# Grounded figures — the fix for strained images and empty wordplay. A figure
-# earns its place only when it tells the editor something about the music.
-GROUNDED_RULE = (
-    "GROUNDED FIGURES - every metaphor or simile must have a POINT. It earns its "
-    "place only if it tells the editor something true about how the music sounds "
-    "or feels. \"Her visuals glimmer like a sweltering swimming pool, begging you "
-    "to jump in\" works because the record is summery and the image says what the "
-    "music does: it invites you in. Wordplay is not a point: riffing on an album "
-    "title or extending the artist's conceit (\"a boy who scammed her gets the "
-    "antique-spinning-wheel treatment\") is clever but tells the reader nothing "
-    "about the sound, so cut it and use the artist's imagery as texture instead. "
-    "Also cut anything surreal, melodramatic, or that needs decoding (\"singing "
-    "over VHS static like she's the girl in a home movie nobody meant to keep\"). "
-    "Reach for everyday, relatable comparisons an editor gets on the first read. "
-    "A true, concrete sentence always beats a strained image. When in doubt, "
-    "describe what is literally there."
-)
-
-# Movement-based structure — a strong pitch progresses, it doesn't dump. Modelled
-# on how real press releases move: the immediate release and its image, then the
-# project and its marketable specifics, then momentum. It ends on substance, NOT
-# on a "happy to send / let me know" sign-off.
-STRUCTURE_RULE = (
-    "STRUCTURE - write in distinct movements (2-4 short paragraphs) that flow into "
-    "each other, not one undifferentiated block:\n"
-    "  1. LEAD: the immediate release (the new single / focus track) and the "
-    "broader image or hook it opens up.\n"
-    "  2. WIDEN: the album/project itself, its concept, sound, and visual world, "
-    "plus the marketable points an editor actually uses (comparison artists "
-    "\"for fans of X to Y\", standout visual or production facts, a press quote).\n"
-    "  3. CLOSE: momentum, tours, notable tourmates and collaborators, release "
-    "cadence. End on the music or the momentum, NOT on a call to action.\n"
-    "This is the shape of a good pitch, not a rigid template; adapt the movements "
-    "to the material and let them read as connected prose, never labelled sections."
-)
-
-# The AI "watermarks" to design out — the tells that make a pitch read as
-# machine-written even when every fact is right. These are hard constraints and
-# the deterministic audit backstops the dash rule regardless of the model.
-WRITING_RULES = (
-    "WRITING MECHANICS - avoid the tells of AI writing:\n"
-    "- NO em dashes or en dashes anywhere (no —, no –). Reach for a comma, a "
-    "period, parentheses, or split the sentence. A dash almost always means the "
-    "line wants to be two sentences or one comma.\n"
-    "- Almost no colons. At most one in the entire pitch, and only for a real list. "
-    "Never a colon for dramatic reveal (\"The concept: ...\", \"The genius move: "
-    "...\").\n"
-    "- Let it FLOW. Most sentences should be medium-length and connected, joined "
-    "with real clauses; vary the length around that. Never strand a small fact as "
-    "a clipped fragment (\"Day Wave produced.\", \"The hook is sweet.\"); fold it "
-    "into a fuller sentence. No runs of punchy fragments, one-line drama, or "
-    "mic-drop sentences. Equally, no run-ons that cram a whole list into one "
-    "breath: when you have five vivid details, keep the two or three best and let "
-    "the rest go. Read it aloud; it should sound relaxed and human, like prose to "
-    "a colleague.\n"
-    "- Keep every sentence CLEAR and easy to read. Legible, not simple: an editor "
-    "should glide through on the first pass. Favour plain syntax and everyday words "
-    "that carry vivid images; avoid tangled clauses and clever-for-clever's-sake "
-    "phrasing that makes the reader stop and re-read.\n"
-    "- Trust the details. Don't over-dramatize or hype; the specifics do the work.\n"
-    "- NO sign-off and NO call to action. Never end with \"happy to send,\" \"I can "
-    "send the link / press photos,\" \"reach out,\" or \"let me know.\" End on the "
-    "record or the momentum.\n"
-    "- Name a producer, engineer, or collaborator ONLY if they are a genuine draw "
-    "an editor would recognize. If they aren't notable, leave them out rather than "
-    "spend a line on them."
+# The whole voice, in one brief. The gold examples below are the real target;
+# this brief only names what they have in common so the model has the pattern in
+# words too. Resist re-growing it: new lessons belong in the learned editor's
+# notes (feedback.py), and the surest way to teach the voice is to add another
+# gold example, not another rule.
+VOICE_BRIEF = (
+    "HOW TO WRITE\n"
+    "Write like a music publicist sending an editor a one-sheet: clear, "
+    "confident, factual prose that leads with news and earns attention with real "
+    "achievements, not adjectives. The gold examples below are the target; match "
+    "their register, not any single one's subject.\n"
+    "- Lead with the news. Open with the artist and the immediate reason for the "
+    "pitch, the new single, video, mixtape, tour, or announcement, stated "
+    "plainly. Never open with a metaphor, a mood, or a scene.\n"
+    "- Stack real credibility. The substance of a pitch is concrete achievement: "
+    "named press outlets, streaming and chart numbers, co-signs, festival slots, "
+    "tourmates, collaborators, sold-out dates, the label. Surface these, do not "
+    "trim them; density of real facts is the point. Use only facts present in the "
+    "source, verbatim, and never invent a number, outlet, quote, or co-sign.\n"
+    "- Build momentum. Arrange the facts into an ascending case that this artist "
+    "is on the rise, and give the reader a reason to care right now.\n"
+    "- One quote, for the thesis. When the source has an artist quote that frames "
+    "the project's intent or story, use it verbatim to anchor the pitch. Do not "
+    "stack several quotes, and never invent one.\n"
+    "- Two movements. First the immediate news and the momentum around it; then "
+    "the origin story and the longer case for why the artist matters. End on "
+    "forward motion, what is next or coming, not a sign-off or call to action.\n"
+    "- Keep the prose plain and journalistic and let the facts carry it. A light "
+    "flourish is welcome when it is bolted to a fact (\"glitter-encrusted "
+    "electronic pop\", \"melt-in-your-mouth dance pop earworms\"), but never a "
+    "whole sentence of atmosphere, never an extended metaphor, and never "
+    "worldbuilding for its own sake. If a phrase carries no information, cut it.\n"
+    "- Punctuation is normal professional prose. Em dashes, colons, and lists are "
+    "all fine, used the way the examples use them. Write naturally and name "
+    "producers, collaborators, and outlets freely; that is the kind of fact an "
+    "editor wants."
 )
 
 # Style presets for the UI dropdown — the register the writer adopts. Each maps
@@ -211,13 +131,13 @@ WRITING_RULES = (
 # artist_voice; the rest set an explicit register.
 STYLE_PRESETS: dict[str, tuple[str, str]] = {
     "match":       ("Match the artist",
-                    "Echo the artist's own voice and energy; let their aesthetic set the register."),
+                    "Let the artist's own energy set the register, still newsy and fact-led."),
     "understated": ("Cool & understated",
                     "Calm and confident, low on adjectives. Let the facts and details carry it."),
     "vivid":       ("Warm & vivid",
-                    "Sensory and image-led with a little colour, still grounded and professional."),
-    "authority":   ("Authority & thesis",
-                    "Lead with leverage: press, co-signs, metrics, and a clear cultural thesis."),
+                    "A little more colour and energy, every flourish still bolted to a fact."),
+    "authority":   ("Authority & press",
+                    "Lead with leverage: the biggest press, co-signs, chart and streaming numbers."),
     "plain":       ("Straight & factual",
                     "Newsy and direct. Minimal styling, just the story and the specifics."),
 }
@@ -236,8 +156,8 @@ def style_guidance(style_key: str, artist_voice: str = "") -> str:
 CLASSIFIER_SYSTEM = (
     "You are a senior music PR strategist. You read an artist's background material "
     "and decide the strategic angle for a pitch, then pull out the concrete raw "
-    "material a writer will use — including the artist's own tonal fingerprint so "
-    "the pitch can subtly echo their voice. You are precise and never invent facts."
+    "material a writer will use, above all the marketable facts and achievements "
+    "that build the artist's credibility. You are precise and never invent facts."
 )
 
 
@@ -247,27 +167,30 @@ def classifier_prompt(context: str) -> str:
         "exact shape:\n"
         "{\n"
         '  "archetype": "Archetype_A" | "Archetype_B",\n'
-        '  "key_anchors": [concrete visuals, sonic details, or co-signs to build on],\n'
+        '  "news_hook": "the single immediate reason for this pitch (the new single, video, mixtape, tour, or announcement) the pitch should open with",\n'
+        '  "momentum_points": [the concrete achievements to STACK, verbatim from the source: named press outlets, streaming and chart numbers, co-signs, festival slots, tourmates, collaborators, sold-out or notable shows, labels, list placements],\n'
+        '  "key_anchors": [concrete sonic, visual, or biographical details to build on],\n'
         '  "press_quotes": [verbatim quotes actually present in the text, with source if given],\n'
         '  "cultural_themes": [themes/contradictions the artist embodies],\n'
         '  "comparison_artists": [named acts a writer can anchor to for "for fans of X"],\n'
-        '  "sensory_motifs": [recurring images, textures, colours, or objects from the artist\'s world],\n'
-        '  "descriptors": [8-14 short clickable tags, 1-4 words each, capturing the record\'s themes, sonic qualities, and visual motifs - the toggles a user picks from],\n'
+        '  "sensory_motifs": [recurring images, textures, colours, or objects from the artist\'s world, if any],\n'
+        '  "descriptors": [8-14 short clickable tags, 1-4 words each, capturing the record\'s genre, sonic qualities, themes, and scene - the toggles a user picks from],\n'
         '  "angle_options": [2-3 distinct one-line strategic angles the pitch could lead with],\n'
-        '  "artist_voice": "2-3 sentences naming the artist\'s tonal fingerprint, their EMOTIONAL TEMPERATURE (sunny? playful? melancholy? deadpan? warm? dark?), and the sensory world (colours, textures, tastes, objects) a writer should echo. Capture the warmth/whimsy if it is there, not only the edge",\n'
+        '  "artist_voice": "1-2 sentences naming the artist\'s energy and register (confident? playful? austere? deadpan?) so the prose can match it. Keep it light; this is register, not a mood board",\n'
         '  "recommended_angle": "the single strongest one-line strategic angle (usually angle_options[0])"\n'
         "}\n\n"
         f"Choose {ARCHETYPE_A} ({ARCHETYPES[ARCHETYPE_A]['name']}) when: "
         f"{ARCHETYPES[ARCHETYPE_A]['when']}\n"
         f"Choose {ARCHETYPE_B} ({ARCHETYPES[ARCHETYPE_B]['name']}) when: "
         f"{ARCHETYPES[ARCHETYPE_B]['when']}\n\n"
-        "Rules: press_quotes must appear verbatim in the text (else empty list). "
-        "comparison_artists must be acts explicitly named in the source (as "
-        "influences, tourmates, or reference points); do not invent comparisons. "
-        "descriptors, sensory_motifs and artist_voice are read from the source's own "
-        "imagery and tone; do not fabricate a personality the material doesn't "
-        "support. descriptors should be crisp and human-readable (e.g. \"woman-scorned "
-        "summer\", \"lo-fi darkwave\", \"fairytale revenge\").\n\n"
+        "Rules: momentum_points and press_quotes must appear verbatim in the text "
+        "(else empty list); these are the credibility, so be thorough and pull "
+        "every real outlet, number, co-sign, and tour fact. comparison_artists "
+        "must be acts explicitly named in the source (as influences, tourmates, or "
+        "reference points); do not invent comparisons. descriptors and artist_voice "
+        "are read from the source; do not fabricate a personality the material "
+        "doesn't support. descriptors should be crisp and human-readable (e.g. "
+        "\"shoegaze trap\", \"hyperpop\", \"detroit electronic\").\n\n"
         "--- ARTIST BACKGROUND ---\n"
         f"{context}\n"
         "--- END ---"
@@ -275,90 +198,62 @@ def classifier_prompt(context: str) -> str:
 
 
 # --- Gold-standard examples (few-shot) ------------------------------------
-# Real pitches that exemplify the house voice, one per archetype. The model
-# imitates examples far more faithfully than it follows described rules, so
-# these carry the sentence rhythm and metaphor discipline. Lightly edited to
-# conform to house mechanics (no dashes, at most one colon); source: the
-# reference pitch doc. They are calibration, not material — the prompt forbids
-# reusing their images or phrases, even for the same artist.
+# Seven real pitches that define the house voice: professional music one-sheets
+# that lead with news and stack concrete achievements. The model imitates
+# examples far more faithfully than it follows described rules, so these carry
+# the register. They are kept verbatim as data so (a) the exemplar library can
+# seed from them and (b) the feedback loop can recognise and skip a user "edit"
+# that is really one of these pasted back in. They are calibration, not material:
+# the prompt forbids reusing their specific facts, phrases, or openings.
+
+GOLD_PITCH_1 = """Vancouver artist and producer Sophia Stel has just shared her new single "Molly In The Club". Self-produced and written by Stel, the track is highlighted by its playful music video, which she shot with her best friends earlier this summer at the Vancouver Aquarium, and arrives following heavy fan demand for the track throughout her recently wrapped headline international tour. "Molly In The Club" serves as her second release with A24 Music after April's "Bitches Talk Shit", which garnered praise from the likes of Pitchfork, NME, DAZED, CRACK, Pigeons & Planes, CLASH, and Gorilla vs. Bear, and follows her run opening for Lorde at the Kia Forum in Los Angeles last month. Recent months have also seen Stel make her runway debut at Ann Demeulemeester's Paris Fashion Week SS26 show, grace the covers of The Face and NME, and model spreads for Palace Skateboards and BASKETCASE following the release of her breakout EP, How to Win At Solitaire, the deluxe edition of which features collaborations with Mura Masa, Tommy Genesis, and Cecile Believe.
+
+How to Win At Solitaire was produced, written, and recorded by Stel in a makeshift basement studio at Vancouver's since shuttered Paradise, the DIY club she worked in at the time. Released in September, it served as her second project following her 2024 debut EP, Object Permanence. The 2025 deluxe edition featured sleeper hit "I'll Take It", which rapidly caught fire on TikTok — and earned her co-signs from Troye Sivan and Megan Skiendiel of KATSEYE. Hailing from the Pacific Northwest, she first cut her teeth within Vancouver's local music scene, turning heads for her free-flowing prose, Y2K-indebted visuals, and mythos-tinted autobiography. Coupling lyricism inspired by her everyday life with patchwork aesthetics infused with the spontaneous, DIY ethos of homemade digicam videos, Stel has also been championed by PC Music legend A.G. Cook and was named to the The NME 100 in 2025. In addition to a performance at Pitchfork Festival in Paris, she was also recently selected for this year's DAZED 100 and Pigeons & Planes' 26 Artists To Watch In 2026 list, while earning spots on Best Of 2025 lists from The Face, Notion, Gorilla vs. Bear, and Hearing Things. She is currently working on her debut album."""
+
+GOLD_PITCH_2 = """Thoom could have made two records: one rooted in American pop and another in experimental, punk-influenced Arabic music. Instead, she made Everyday, everything is at stake, because separating those sides of her music would have meant separating parts of herself. “I would be lying to my listeners if I tried to separate what seems the most natural to me,” she says. “The contradiction is the point.” You can hear that decision across the nine-song project with “December Forever” embracing the English pop songwriting she had long wanted to master, while “Janani,” the fully Arabic focus track, moves into more experimental territory. Executive-produced by Dylan Brady of 100 gecs and created between Los Angeles and Lebanon, the project takes its title from what she describes as “the immigrant mentality”: the reality of building a life in America while carrying family, history, and another part of herself in Lebanon, never fully integrating into either. Inspired by her travels, the project is “part diary, part mythology,” with each song written as its own intense, self-contained story. Less a confession than a record of survival, the result is, in Thoom’s words, “messy, pop, Arabic, experimental, and unapologetic.” That same instinct shapes how she writes: “Melody always comes before the lyrics for me. The emotion always comes before you have the words to express it.”
+
+On “Towards the sky,” Thoom turns the rhetoric of exile into something triumphant. Released July 17 with an accompanying music video, the single captures the project's core tensions between displacement and belonging, tenderness and rage, girlhood and revolution. The single follows “December Forever” (500K+ streams) which appeared in an Instagram Story of Arca singing along last October, and serves as the final release ahead of the project’s arrival on July 31.
+
+The project arrives amid growing international momentum for Thoom. Alongside recent shows in Cairo and Los Angeles, including a show with Cece Natalie, she has performed across the US and Europe with Bassvictim, Jockstrap, Yves Tumor, Underscores, Frost Children, Dorian Electra, and The Dare. Everyday, everything is at stake, Thoom’s first project since her 2023 debut EP Fantasy for Danger, is the fullest realization yet of a sound she has spent years developing. A separate full-length album will follow later this summer, ahead of an unannounced direct-support run across more than 20 North American cities this fall."""
+
+GOLD_PITCH_3 = """Fresh off the release of her debut mixtape Lullabies, Glasgow-raised artist and producer heartcoregirl has just shared the video for her new single, "bloom". A hopeful, grunge-tinted anthem, "bloom" explores the tension of societal objectification while yearning for more and is highlighted by a playful visual that follows her around The Ritz-Carlton Hotel in London — dressed formally, interacting with the guests, and imagining what it would be like to one day live the high life, too. The song stamps her first outing since dropping the aforementioned Lullabies in February, which features 12 tracks and is rooted in themes of femininity and sensitivity, even amidst harsh environments. A self-confessional outing that invites listeners into the world heartcoregirl inhabits, the tape is inspired by her experience coming up within Europe's underground SoundCloud scene, often finding herself as the only woman on the lineup at the shows where she first cut her teeth. It arrived on the heels of previously released singles "cherry sundae", "no trace", "Little baby sweet", and "Glide" — as well as three years spent performing the collection of songs in clubs from Tokyo to Prague.
+
+First earning a cult following online for her lullaby vocals and dollhouse aesthetics, the Glaswegian vocalist and visual artist is known for her dreamy, shoegaze trap sound, intimate live performances, and introspective lyricism that soundtracks life's softest (and hardest) moments. After breaking out with "no trace" in 2023, she continued to turn heads with a run of singles, recent shows alongside fakemink and Bassvictim, and frequent collaborations with buzzy NYC electronic duo Suzy Sheer. In addition to the release of Lullabies, she was also recently selected for the NME 100 in 2025."""
+
+GOLD_PITCH_4 = """Tiffany Day has just announced her upcoming twelve-stop HALO TOUR EUROPE. Arriving ahead of her upcoming eight-stop HALO Tour, which was recently announced, sold out, upgraded, and sold out once again, the HALO TOUR EUROPE spans 10 countries over the span of two weeks, as Tiffany takes her blown-out, bass-heavy electro-pop sound to international audiences for the first time. Pre-sale starts today with general sale starting Friday, June 26th at 10 am BST. This tour comes on the heels of her link-up with underground rap phenom slayr for her first single of the summer, “Constantly”, marking Tiffany's first release since her breakthrough album HALO arrived in early April. Fans had been anticipating the collaboration since mid-April, when slayr alluded to an upcoming track with Tiffany on X, and excitement only grew when Tiffany brought him out during her set at Summer Smash this past weekend to perform the unreleased song live. With back-to-back tours on the horizon, Tiffany Day continues to build off the momentum of HALO while bringing her music to audiences around the world.
+
+Over the past two years, Tiffany Day has emerged as one of the most compelling voices in hyper-digital pop. In 2024, she independently funded and sold out several headline shows across a North American tour. She later expanded into the DJ scene, launching BASSFLUFF, a series of standalone events that generated viral moments DJing everywhere from gyms to nail salons. Her 2025 releases marked a sharp sonic evolution, leaning into electroclash and hyperpop textures, with singles like “BREAKUP”, “TELL ME WHAT I DID”, and “START OVER” generating millions of views across platforms and earning coverage from NME, Ones to Watch, On The Radar, and beyond. That momentum culminated in her album HALO, released April 3rd, 2026 via Broke Records. The project debuted at #1 on the Apple Music Electronic chart and #25 on the Billboard Electronic/Dance Albums Chart, drawing early co-signs from artists like Laufey, Yunjin (LE SSERAFIM), and The Weeknd, alongside coverage from Pitchfork, The FADER, NYLON, LA Times, and more. HALO stands as Tiffany’s most cohesive and ambitious work to date, further establishing her as a defining voice in the next era of hyperpop while laying the foundation for her next chapter."""
+
+GOLD_PITCH_5 = """Following her standout B2B performance with umru at Palomosa Festival in Montreal and the release of her first single of 2026, "Stereo", French pop artist and producer Cannelle has announced that her debut mixtape CINNA will be out June 26th, alongside the release of her newest video single, "Dis Moi" and the announcement of her headlining Los Angeles and New York City project release shows. "Dis Moi" weaves in and out of trap influences and bilingual lyrics, meshing English and French into a congruent, larger-than-life synth-pop hit. “Dis-Moi’ is sexy, and seductive. I wanted to make a fun song about a crush that sounds catchy, but still mysterious.” This arrives as the second single off her forthcoming debut mixtape CINNA, a record which was crafted after two years of near-daily studio sessions in New York and Los Angeles, plus a slate of buzzy live performances in Paris. Sung in both French and English and co-produced alongside Chicken, Oscar Scheller, and Warpstr, it’s more than just a collection of avant-garde, rave-ready earworms, as composed as they are boisterous. It’s a beacon for every brilliant Black woman determined to soundtrack her own life, regardless of genre stigma — and for every young creative who thrives when they let loose.
+
+The 20-year-old Marseille-born, Los Angeles-based artist’s glitter-encrusted electronic pop has captivated in-the-know listeners since her 2024 breakout single “LUCKY”, a self-produced track that has since surpassed 1M streams across platforms. While juggling an established modeling career that’s seen her work with Valentino and Heaven by Marc Jacobs, she continued to thrill French and international fans alike with melt-in-your-mouth dance pop earworms like “CLOVER”, “DIAMOND CUTS”, “FILLE”, and “MP3”. Having packed out shows in Paris (where she distributed blue wigs across a crowd too rapt to take their phones out) and opened for Ninajirachi, Cannelle is now ready for the next step in her rise to stardom."""
+
+GOLD_PITCH_6 = """Fresh off the release of her new mixtape Blue Angel Sparkling Silver 2, Austin artist and producer Quiet Light (AKA Riya Mahesh) has just announced that she'll be embarking on a headline European tour this fall. The 11-stop run kicks off on October 28th in Barcelona and concludes in London on November 11th. Artist pre-sale begins tomorrow at 10AM local time. Sign up now to receive early access to tickets (RSVP HERE). General tickets are on-sale this Wednesday at 10AM local time. Led by singles "Berlin", "Postinternetfame", and "Self Tape", Blue Angel Sparkling Silver 2 serves as a sister tape to Mahesh's 2023 project, Blue Angel Sparkling Silver. The self-written and produced record stamped her debut release with True Panther and garnered praise from the likes of Rolling Stone, Pitchfork, NPR, NME, The FADER, The Quietus, and Stereogum. Mahesh also recently played a slate of release shows in support of the project and launched a limited-edition vinyl, which features a 2-disc pressing of both Blue Angel Sparkling Silver and Blue Angel Sparkling Silver 2.
+
+Hailing from Dallas, Mahesh first arrived on the scene with her 2020 self-titled debut EP, Quiet Light. The project kicked off a run of independent, self-produced records, with Quiet Light turning heads for her irresistible hooks and an unmistakable production style that bridges the gap between folk, electronic, and pop music. But as life started to get serious, and medical school and a record deal came knocking, Mahesh moved back to Texas, finding herself nostalgic for the freedom of recording Blue Angel Sparkling Silver — a time when the confines of a professional career never crossed her mind, and every creative choice was unfiltered, made simply out of love for the music. Enter Blue Angel Sparkling Silver 2, which finds its magic somewhere between suburban nostalgia and the uncertainty of a long, open road, bucking genre confines in search of unfettered emotion. The project is one of reconciling contradiction, as Mahesh oscillates between the sterility and carnage of the Massachusetts hospital where she’s currently completing her medical school training and the secluded softness of her bedroom studio in Austin. As she puts it: “This record is for people who dream about what their life could be like.”"""
+
+GOLD_PITCH_7 = """Fresh off a standout performance at Rolling Loud Orlando, his latest EP Mastiff and the announcement of his headlining Mastiff: Pink Tiles Tour, New Detroit artist Lelo has just shared a new single, "Get Geeked". Fully diving into his Ghettotech influences (watch his recent set at The Lot Radio here), "Get Geeked" blends upbeat rap bars with the sonics of classic Detroit Electronic music –– resulting in a groovy, dancefloor-ready anthem. This new single arrives ahead of what's about to be a busy summer for Lelo as he hits the road for his headlining Mastiff: Pink Tiles Tour, kicking off on July 6th in Toronto after Lelo's debut Rolling Loud set in Orlando this weekend, Summerfest in June. Performing alongside Groovepill and comprised of 13 tour dates and two festivals, as well as a Boiler Room performance in NYC alongside JID, Kenny Beats and TiaCorine, the forthcoming Mastiff: Pink Tiles Tour will bring Lelo's New Detroit sound to the masses after a breakout year in 2025. After Lelo's biggest streaming debut yet with recent single "Monetize" (7M+ Streams), the release of "Yoppenheimer Remix" with Joey Bada$$ and the Mastiff EP, "Get Geeked" is the latest move in a momentous start to 2026 for Lelo and serves as a prime example of how he's continuing to evolve his New Detroit sound –– which he's contextualized in recent profiles with Pitchfork, Highsnobiety and The FADER. After being stamped by both Billboard and COMPLEX as a 2026 Artist to Watch to kick off the year, Lelo has lived up to the name, keeping the momentum going after a triumphant 2025 debut album, New Detroit (7.8 rating + 7th Best Rap Album of the year from Pitchfork) and a subsequent sold-out four city headlining New Detroit Tour.
+
+While new to a more national spotlight, Lelo has been a consistent standout within the regional Detroit scene. Early works such as "Hughes" (10M+ Streams) and "Daybreakers" grabbed immediate attention from new listeners, bolstering a rocket-like ascent for the young lyricist. Listeners have had the opportunity to witness Lelo reimagine the Detroit sound in real time, with each new output offering a unique sonic experience within the usually familiar sound. More experimental production choices, like the inclusion of 80s Detroit House music within his instrumentals, are responsible for the undeniable intrigue that his music brings. The bold, Sade-sampling "Main Event" (28M+ Streams) in tandem with his other 2025 singles earned him strong praise from fellow artists such as Earl Sweatshirt, Pi'erre Bourne, LUCKI, and Brent Faiyaz, just to name a few. Though the voice of many through his growing "New Detroit" movement, the young standout prefers to operate alone on his projects, impressively surpassing over a million monthly listeners before ever releasing a song with a feature. The Motor City has much to look forward to with their very own Lelo leading the charge."""
+
+GOLD_PITCHES = [GOLD_PITCH_1, GOLD_PITCH_2, GOLD_PITCH_3, GOLD_PITCH_4,
+                GOLD_PITCH_5, GOLD_PITCH_6, GOLD_PITCH_7]
+
+# Static fallback for the generator when the exemplar library is empty (normally
+# retrieval in logic/exemplars.py picks the 2-3 most relevant instead). One
+# established/press example and one emerging/story example.
 GOLD_EXAMPLES = (
-    "GOLD-STANDARD EXAMPLES - two real pitches written in exactly the voice to "
-    "aim for. Study how the sentences flow (connected, medium-length, relaxed), "
-    "how every image says something true about the music, and how each pitch "
-    "ends on the record or the momentum. Do NOT reuse their specific images, "
-    "phrases, jokes, or openings in your own pitches, even when writing for the "
-    "same artist. They calibrate the voice, nothing more.\n"
+    "GOLD-STANDARD EXAMPLES - real pitches written in exactly the voice to aim "
+    "for. Study how each leads with the news, stacks concrete achievements "
+    "(press, numbers, co-signs, tours), and ends on forward momentum. Do NOT "
+    "reuse their specific facts, phrases, or openings in your own pitches. They "
+    "calibrate the voice, nothing more.\n"
     "\n"
-    "EXAMPLE 1 (Worldbuilding / Sensory):\n"
-    "Faerybabyy is frolicking through summer ahead of her upcoming sophomore "
-    "album. Her latest single “tough luck” is an indie rock and pop jam best "
-    "served with a side of watermelon and ice-cold lemonade. Bobbing around "
-    "between buoyant synthesizers and sun-kissed hooks, the track is a veritable "
-    "ribbon-cutting ceremony for what Faerybabyy calls her “woman-scorned "
-    "summer,” contrasting the imagery of suburban Americana with the cloying "
-    "sting of heartbreak.\n"
+    "EXAMPLE 1 (Authority & Press):\n"
+    + GOLD_PITCH_1 + "\n"
     "\n"
-    "Drawing from internet culture, fantasy, horror, and DIY art, "
-    "“rumpelstiltskin” blends iconography from fairytales, dating sims, "
-    "found-footage horror, hand-drawn animation, and suburban photobooks into a "
-    "world equal parts conflict, discovery, humor, vulnerability, and "
-    "imagination. Behold through your mall-bought strawberry Ray-Bans as "
-    "Faerybabyy’s relationships rise and collapse in surreal fashion. "
-    "“rumpelstiltskin”’s upbeat mix of rock and pop will invite the eager ears "
-    "of anyone, from fans of The Strokes to Olivia Rodrigo, while never "
-    "compromising on her dusty, lofi sound. Her distinct visuals glimmer like "
-    "the opalescent surface of a sweltering swimming pool, begging listeners to "
-    "jump right in. When they do, they’ll be greeted by a visual world much "
-    "deeper than it appears. Faerybabyy has created music videos and visualizers "
-    "for all ten tracks on “rumpelstiltskin.”\n"
-    "\n"
-    "With a steady stream of upcoming releases and tour dates throughout the "
-    "U.S. this fall and winter, including performances with blood club, Slater, "
-    "Israel’s Arcade, and SadGirl, Faerybabyy continues to gather momentum and "
-    "approach a worldwide listener-base, all the while building distinct musical "
-    "worlds from scratch. Her first full-length project since the acclaimed "
-    "“Jabbermouth”, “rumpelstiltskin” is the summer picnic that you just can’t "
-    "miss. Bring your swimsuit!\n"
-    "\n"
-    "EXAMPLE 2 (Authority / Thesis):\n"
-    "Thoom could have made two records: one rooted in American pop and another "
-    "in experimental, punk-influenced Arabic music. Instead, she made Everyday, "
-    "everything is at stake, because separating those sides of her music would "
-    "have meant separating parts of herself. “I would be lying to my listeners "
-    "if I tried to separate what seems the most natural to me,” she says. “The "
-    "contradiction is the point.” You can hear that decision across the "
-    "nine-song project with “December Forever” embracing the English pop "
-    "songwriting she had long wanted to master, while “Janani,” the fully "
-    "Arabic focus track, moves into more experimental territory. "
-    "Executive-produced by Dylan Brady of 100 gecs and created between Los "
-    "Angeles and Lebanon, the project takes its title from what she describes as "
-    "“the immigrant mentality”, the reality of building a life in America while "
-    "carrying family, history, and another part of herself in Lebanon, never "
-    "fully integrating into either. Inspired by her travels, the project is "
-    "“part diary, part mythology,” with each song written as its own intense, "
-    "self-contained story. Less a confession than a record of survival, the "
-    "result is, in Thoom’s words, “messy, pop, Arabic, experimental, and "
-    "unapologetic.” That same instinct shapes how she writes. “Melody always "
-    "comes before the lyrics for me. The emotion always comes before you have "
-    "the words to express it.”\n"
-    "\n"
-    "On “Towards the sky,” Thoom turns the rhetoric of exile into something "
-    "triumphant. Released July 17 with an accompanying music video, the single "
-    "captures the project’s core tensions between displacement and belonging, "
-    "tenderness and rage, girlhood and revolution. The single follows “December "
-    "Forever” (500K+ streams) which appeared in an Instagram Story of Arca "
-    "singing along last October, and serves as the final release ahead of the "
-    "project’s arrival on July 31.\n"
-    "\n"
-    "The project arrives amid growing international momentum for Thoom. "
-    "Alongside recent shows in Cairo and Los Angeles, including a show with Cece "
-    "Natalie, she has performed across the US and Europe with Bassvictim, "
-    "Jockstrap, Yves Tumor, Underscores, Frost Children, Dorian Electra, and The "
-    "Dare. Everyday, everything is at stake, Thoom’s first project since her "
-    "2023 debut EP Fantasy for Danger, is the fullest realization yet of a sound "
-    "she has spent years developing. A separate full-length album will follow "
-    "later this summer, ahead of an unannounced direct-support run across more "
-    "than 20 North American cities this fall."
+    "EXAMPLE 2 (Story & Momentum):\n"
+    + GOLD_PITCH_3
 )
 
 
@@ -369,13 +264,16 @@ GOLD_EXAMPLES = (
 # generator returns plain text with pitches split by this delimiter line.
 PITCH_DELIM = "===PITCH==="
 
-GENERATOR_SYSTEM = (
+# Persona + voice brief, without examples: the pipeline appends the retrieved
+# gold exemplars (logic/exemplars.py) and the team's before/after edit pairs.
+GENERATOR_BASE = (
     "You are an elite music publicist writing a pitch to a specific editor. "
-    "You write with concrete detail and a distinct point of view. "
-    + STYLE_RULES + "\n\n" + VOICE_RULE + "\n\n" + IMAGERY_RULE + "\n\n"
-    + SHOW_DONT_TELL_RULE + "\n\n" + GROUNDED_RULE + "\n\n" + STRUCTURE_RULE
-    + "\n\n" + WRITING_RULES + "\n\n" + GOLD_EXAMPLES
+    "You write with concrete detail and a distinct point of view.\n\n"
+    + VOICE_BRIEF
 )
+
+# Static fallback (base + built-in examples) for callers without a db handle.
+GENERATOR_SYSTEM = GENERATOR_BASE + "\n\n" + GOLD_EXAMPLES
 
 
 def generator_prompt(*, context: str, strategy: dict, num_options: int,
@@ -387,27 +285,16 @@ def generator_prompt(*, context: str, strategy: dict, num_options: int,
     lead_angle = angle.strip() or strategy.get("recommended_angle", "")
     voice = strategy.get("artist_voice", "")
     desc_line = (
-        f"Selected themes to carry (see THEMES ARE ATMOSPHERE below): "
-        f"{descriptors}\n" if descriptors else ""
+        f"Angles/themes the user wants foregrounded (weave in naturally, do not "
+        f"paste verbatim unless a proper noun): {descriptors}\n" if descriptors else ""
     )
-    theme_rule = (
-        "THEMES ARE ATMOSPHERE, NOT PHRASES. The themes and sensory motifs "
-        "above are a mood board, not vocabulary. Absorb them, then write from "
-        "inside that mood so it quietly colors the verbs, images, and structure "
-        "of the WHOLE pitch. Never insert a tag's wording verbatim (unless it is "
-        "a proper noun like an album or genre name), never paraphrase the tags "
-        "into one dutiful sentence each, and never cluster them in a single "
-        "paragraph. An editor should finish the pitch able to guess the themes "
-        "without ever seeing the list. Across your options, express the themes "
-        "through DIFFERENT images in different places; if the same phrase would "
-        "appear in two options, cut it from one.\n"
-        if (descriptors or strategy.get("sensory_motifs")) else ""
-    )
+    news_hook = strategy.get("news_hook", "")
+    hook_line = f"News hook to lead with: {news_hook}\n" if news_hook else ""
     learn_line = f"{learning}\n" if learning else ""
     avoid_line = (
         "These pitches already exist for this artist; make the new ones clearly "
-        "DIFFERENT (different lead single, opening image, and structure), not "
-        f"variations on them:\n{[o[:160] for o in avoid_openings]}\n"
+        "DIFFERENT (a different lead, a different opening, a different set of facts "
+        f"foregrounded), not variations on them:\n{[o[:160] for o in avoid_openings]}\n"
         if avoid_openings else ""
     )
     return (
@@ -416,28 +303,24 @@ def generator_prompt(*, context: str, strategy: dict, num_options: int,
         f"{style_guidance(style, voice)}\n\n"
         f"{learn_line}"
         f"{avoid_line}"
+        f"{hook_line}"
         f"Strategic angle to lead with: {lead_angle}\n"
         f"{desc_line}"
-        f"Sensory motifs from their world (raw material to transform, not to "
-        f"quote): {strategy.get('sensory_motifs', [])}\n"
-        f"{theme_rule}"
+        f"MOMENTUM TO STACK (the credibility; use verbatim, and surface as many as "
+        f"fit naturally, do not trim them away): {strategy.get('momentum_points', [])}\n"
         f"Comparison artists to anchor an editor (use only these, verbatim): "
         f"{strategy.get('comparison_artists', [])}\n"
         f"Key anchors: {strategy.get('key_anchors', [])}\n"
         f"Press quotes available (use verbatim, never invent): "
         f"{strategy.get('press_quotes', [])}\n"
         f"Cultural themes: {strategy.get('cultural_themes', [])}\n\n"
-        f"OPEN each pitch with the artist's name as the subject of the first "
-        f"sentence (\"<Artist> is...\", \"<Artist> could have...\"), then go "
-        f"straight to something concrete. Use the angle as your strategic north "
-        f"star, not as the opening line.\n"
-        f"Write {num_options} DISTINCT pitch options. Each takes a genuinely "
-        f"different approach (a different lead single, a different concrete detail to "
-        f"build on), not paraphrases of one pitch. Follow every rule above, "
-        f"especially SHOW DON'T TELL, GROUNDED FIGURES (every image must say "
-        f"something true about the music), and the sentence rules: relaxed, "
-        f"connected, medium-length sentences, no clipped fragments, no crammed "
-        f"lists, no em dashes, no sign-off.\n"
+        f"OPEN each pitch by leading with the news: the artist as the subject and "
+        f"the immediate reason for the pitch (the new single, video, tour, or "
+        f"announcement), stated plainly like the gold examples (\"<Artist> has just "
+        f"shared...\", \"Fresh off <X>, <Artist> has announced...\"). Never open "
+        f"with a metaphor, mood, or scene. Then stack the momentum.\n"
+        f"Write {num_options} DISTINCT pitch options. Each foregrounds a genuinely "
+        f"different angle or lead, not paraphrases of one pitch.\n"
         f"Target length per pitch: {length} (total across the paragraphs).\n\n"
         "Write each pitch as normal prose with blank lines between its paragraphs. "
         "Separate the pitches from each other with a line containing ONLY:\n"
@@ -476,6 +359,10 @@ def insights_prompt(signal: dict) -> str:
         "Base every point on the evidence. If they consistently cut a certain kind "
         "of phrase, 'avoid' it. If a high-rated version has a trait, 'worked' it. "
         "Keep each item a few words. Do not invent.\n\n"
+        "Rejected entries may carry 'reasons' (and the signal may include "
+        "reject_reason_counts): those are the user naming the problem in their "
+        "own words when they hit reject. Treat them like comments, the most "
+        "direct evidence there is.\n\n"
         "ATTRIBUTE EDITS CORRECTLY. Edits may carry user-chosen edit_kinds tags "
         "(content, phrasing, style, grammar, facts, length). An edit tagged "
         "phrasing/style/grammar/length says the WORDING was wrong, never the "
@@ -517,13 +404,41 @@ def house_rules_prompt(signal: dict) -> str:
         "imagery discipline, length, what kinds of facts to lead with. DROP "
         "anything tied to one artist's world (a specific image, album, scene, or "
         "genre quirk). The user's written comments are direct instructions; weight "
-        "them heaviest. If the evidence is thin, return fewer rules rather than "
-        "inventing any.\n\n"
+        "them heaviest, alongside reject_reason_counts if present (the reasons "
+        "the user tapped when rejecting drafts). If the evidence is thin, return "
+        "fewer rules rather than inventing any.\n\n"
         "RESPECT THE USER'S CURATION. If the signal lists user_rejected_rules, "
         "the user explicitly deleted those inferences as wrong: never restate "
         "them or close paraphrases of them. If it lists user_pinned_rules, those "
         "are ground truth the user wrote; do not contradict or duplicate them.\n\n"
         f"--- LABEL-WIDE FEEDBACK ---\n{signal}\n--- END ---"
+    )
+
+
+# --- exemplar auto-tagging (the gold-pitch library) ------------------------
+
+TAG_EXEMPLAR_SYSTEM = (
+    "You catalogue reference pitches for a music PR team. You read one pitch "
+    "and return the short retrieval handles that describe it. You never invent "
+    "facts."
+)
+
+
+def tag_exemplar_prompt(text: str) -> str:
+    return (
+        "Read the reference pitch below and return ONLY a JSON object:\n"
+        "{\n"
+        f'  "archetype": "{ARCHETYPE_A}" | "{ARCHETYPE_B}",\n'
+        '  "tags": [6-10 short handles, 1-3 words each: genres, moods, era, '
+        'energy, "emerging artist" or "established artist", notable techniques]\n'
+        "}\n\n"
+        f"Choose {ARCHETYPE_A} ({ARCHETYPES[ARCHETYPE_A]['name']}) when the pitch "
+        "is for an emerging artist and leads with the release and origin story; "
+        f"choose {ARCHETYPE_B} ({ARCHETYPES[ARCHETYPE_B]['name']}) when it leads "
+        "with heavy press, co-signs, chart or streaming numbers.\n\n"
+        "--- PITCH ---\n"
+        f"{text}\n"
+        "--- END ---"
     )
 
 
@@ -548,65 +463,44 @@ def suggest_themes_prompt(context: str, existing: list[str], n: int = 6) -> str:
     )
 
 
-# --- Stage 3: style & anti-AI audit ---------------------------------------
+# --- Stage 3: surgical self-revision ---------------------------------------
+# The old Stage 3 handed the whole draft to a cheap model with a 12-point rewrite
+# brief; it chopped flowing sentences into fragments and deleted the best lines
+# (the exact damage the user kept rejecting). Now revision only runs when the
+# deterministic scan actually flags something, it is done by the SAME writer
+# model that produced the draft, and it may touch only the flagged sentences.
 
-AUDIT_SYSTEM = (
-    "You are a ruthless line editor. You strip AI/PR clichés and the tells of "
-    "machine writing out of music pitches, ground every strained metaphor, break "
-    "run-on sentences, and replace it all with concrete, flowing, legible human "
-    "prose, while leaving the writer's intentional voice and structure intact. "
-    + STYLE_RULES
+REVISE_SYSTEM = (
+    "You are the publicist who wrote this pitch, giving it one last pass before "
+    "it goes out. You fix only the specific problems you are given and reproduce "
+    "every other sentence exactly as written, preserving the rhythm and voice."
 )
 
 
-def audit_prompt(draft: str, flagged: list[str],
-                 tag_phrases: list[str] | None = None) -> str:
-    flagged_note = (
-        f"A deterministic scan flagged these banned phrases in the draft: {flagged}. "
-        "Remove or rewrite every one of them.\n\n"
-        if flagged else
-        "Scan the draft yourself for any generic PR/AI clichés and rewrite them.\n\n"
-    )
-    tags_note = (
-        f"DISSOLVE THE TAGS. These theme tags were briefing inputs and must not "
-        f"appear in the pitch verbatim: {tag_phrases}. If one shows up "
-        "word-for-word (and is not a proper noun like an album or genre name), "
-        "rewrite that sentence so the idea stays but the exact wording goes.\n\n"
-        if tag_phrases else ""
-    )
+def revise_prompt(draft: str, flagged: list[str],
+                  tag_phrases: list[str] | None = None) -> str:
+    problems = []
+    if flagged:
+        problems.append(
+            f"These clichés appear in the draft and must go: {flagged}. Rewrite "
+            "each sentence containing one so the idea stays but the cliché is "
+            "replaced with a concrete detail already in the pitch."
+        )
+    if tag_phrases:
+        problems.append(
+            f"These briefing tags leaked into the prose verbatim: {tag_phrases}. "
+            "Unless the tag is a proper noun (an album, song, or genre name), "
+            "rewrite the sentence carrying it so the idea stays but the exact "
+            "wording goes."
+        )
+    problem_block = "\n".join(f"- {p}" for p in problems)
     return (
-        "Edit the pitch below so it reads as natural, human, professional prose with "
-        "zero clichés. Replace buzzwords with a concrete image, a specific sonic "
-        "detail, or a real fact from the pitch. Do not add facts.\n\n"
-        "Also fix these problems:\n"
-        "- GROUND THE FIGURES. Rewrite or delete any metaphor or simile that is "
-        "surreal, melodramatic, doesn't quite parse (e.g. \"singing over VHS "
-        "static like she's the girl in a home movie nobody meant to keep\"), or is "
-        "empty wordplay that riffs on a title or conceit without saying anything "
-        "about the sound (e.g. \"gets the antique-spinning-wheel treatment\"). A "
-        "figure stays only if it tells the editor something true about how the "
-        "music sounds or feels; otherwise replace it with a plain, true statement.\n"
-        "- BREAK RUN-ONS. Split any sentence that stacks three or more clauses or "
-        "comma-separated items into shorter sentences. Do not let a sentence cram a "
-        "whole list of details; keep the two or three best and cut the rest.\n"
-        "- FOLD IN FRAGMENTS. Merge any clipped, stranded fragment (\"Day Wave "
-        "produced.\") into a neighbouring sentence so the prose reads connected, "
-        "not punchy.\n"
-        "- Delete EVERY em dash and en dash (no —, no –). Replace with a comma, a "
-        "period, parentheses, or a rephrase so the sentence still flows.\n"
-        "- Cut colons down to at most one, and never a colon used for dramatic "
-        "reveal.\n"
-        "- Delete any sign-off or call to action (\"happy to send\", \"I can send "
-        "the link / press photos\", \"let me know\"). End on the record or momentum.\n"
-        "- Drop a producer/collaborator mention if the name isn't a recognizable "
-        "draw.\n\n"
-        "Preserve exactly: the paragraph structure (keep the \\n\\n breaks), every "
-        "fact, every verbatim press quote, AND the pitch's deliberate voice. A "
-        "playful, sensory pitch stays playful and sensory; only remove the generic "
-        "clichés and the tells, never flatten it into neutral copy.\n\n"
-        f"{flagged_note}"
-        f"{tags_note}"
-        "Return ONLY the edited pitch text, no preamble, no explanation.\n\n"
+        "Fix ONLY the problems listed below. Every sentence that does not contain "
+        "one of these problems must be reproduced word for word; keep the "
+        "paragraph breaks, every fact, and every verbatim quote. Do not add "
+        "facts, and do not otherwise rewrite, tighten, or improve the pitch.\n\n"
+        f"{problem_block}\n\n"
+        "Return ONLY the pitch text, no preamble, no explanation.\n\n"
         "--- DRAFT ---\n"
         f"{draft}\n"
         "--- END ---"

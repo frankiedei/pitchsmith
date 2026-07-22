@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../store/store";
-import { EDIT_KINDS } from "../types";
+import { EDIT_KINDS, REJECT_REASONS } from "../types";
 import type { PitchCardT } from "../types";
 
 /** Backend stamps are UTC but may arrive without a timezone suffix; treat
@@ -30,6 +30,8 @@ export function PitchCard({ card, index }: { card: PitchCardT; index: number }) 
   const [noteOpen, setNoteOpen] = useState(Boolean(card.comment));
   const [kindsOpen, setKindsOpen] = useState(false);
   const [kinds, setKinds] = useState<string[]>([]);
+  const [reasonsOpen, setReasonsOpen] = useState(false);
+  const [reasons, setReasons] = useState<string[]>([]);
   const [touched, setTouched] = useState(false);
   const [saved, setSaved] = useState(false);
   const starTimer = useRef<number | undefined>(undefined);
@@ -68,6 +70,14 @@ export function PitchCard({ card, index }: { card: PitchCardT; index: number }) 
     sendFeedback(card, "edited", rating, text, "", tagged);
     setKindsOpen(false);
     setKinds([]);
+    acknowledge();
+  };
+
+  const doReject = (tapped: string[]) => {
+    setTouched(true);
+    sendFeedback(card, "rejected", rating, text, "", [], tapped);
+    setReasonsOpen(false);
+    setReasons([]);
     acknowledge();
   };
 
@@ -135,11 +145,8 @@ export function PitchCard({ card, index }: { card: PitchCardT; index: number }) 
           </button>
           <button
             className="btn ghost sm"
-            onClick={() => {
-              setTouched(true);
-              sendFeedback(card, "rejected", rating, text);
-              acknowledge();
-            }}
+            onClick={() => setReasonsOpen((o) => !o)}
+            aria-expanded={reasonsOpen}
           >
             Reject
           </button>
@@ -160,6 +167,42 @@ export function PitchCard({ card, index }: { card: PitchCardT; index: number }) 
           </button>
         </div>
       </div>
+
+      {reasonsOpen && (
+        <div className="kind-picker">
+          <span className="kind-q">
+            What went wrong? One tap teaches the exact lesson — no guessing
+            from the stars.
+          </span>
+          <div className="chips">
+            {REJECT_REASONS.map((r) => (
+              <button
+                key={r}
+                className={`chip toggle ${reasons.includes(r) ? "on" : "off"}`}
+                onClick={() =>
+                  setReasons((cur) =>
+                    cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r],
+                  )
+                }
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+          <div className="kind-actions">
+            <button className="btn ghost sm" onClick={() => doReject([])}>
+              Just reject
+            </button>
+            <button
+              className="btn sm"
+              onClick={() => doReject(reasons)}
+              disabled={reasons.length === 0}
+            >
+              Reject{reasons.length > 0 ? ` — ${reasons.join(" + ")}` : ""}
+            </button>
+          </div>
+        </div>
+      )}
 
       {kindsOpen && edited && (
         <div className="kind-picker">

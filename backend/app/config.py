@@ -35,11 +35,12 @@ class Settings(BaseSettings):
     # No key? The classifier/generator/LLM-audit are skipped and the endpoint
     # returns a clear note; the deterministic phrase audit still runs.
     anthropic_api_key: str = ""
-    ai_generate_model: str = "claude-opus-4-8"            # Stage 2: quality tier
+    ai_generate_model: str = "claude-opus-4-8"            # Stage 2 + Stage 3 revision
     ai_classify_model: str = "claude-haiku-4-5-20251001"  # Stage 1: cheap extract
-    ai_audit_model: str = "claude-haiku-4-5-20251001"     # Stage 3: cheap rewrite
     # how many past accepted/edited pitches to feed back as few-shot context
-    feedback_examples: int = 4
+    # (2 team winners + the 2 gold examples = 4 exemplars total; more starts to
+    # crowd the prompt and dilute the gold examples' rhythm)
+    feedback_examples: int = 2
 
     # CORS origin for the Vite dev server
     frontend_origin: str = "http://localhost:5174"

@@ -5,50 +5,57 @@ PR pitches. A **new, separate app** that inherits the Hallwood Label OS
 architecture and UI — built to be merged into the main app later, but standalone
 for now (its own `backend/` and `frontend/`, its own ports).
 
-## Install (macOS, Apple Silicon)
+## Install (one line, always the latest)
 
-No Python, Node, or setup — download and double-click. Paste this into Terminal:
+Paste this into Terminal to fetch the newest version from source, build it, and
+open it. Needs `git`, `python3`, and `node` (on macOS: `brew install git python node`):
 
 ```bash
-curl -L https://github.com/frankiedei/pitchsmith/releases/latest/download/Pitchsmith-macos-arm64.zip -o /tmp/Pitchsmith.zip \
-  && ditto -x -k /tmp/Pitchsmith.zip /Applications \
-  && open /Applications/Pitchsmith.app
+curl -fsSL https://raw.githubusercontent.com/frankiedei/pitchsmith/main/install.sh | bash
 ```
 
-That downloads the app (~40 MB), unpacks it into Applications (~120 MB), and
-opens it. On first launch it asks for your Anthropic API key (get one at
-console.anthropic.com) — paste it then, or leave it blank and add it later.
-Quitting (⌘-Q) stops the background server. Everything it needs — a bundled
-Python, the dependencies, and the built UI — lives inside the app.
+That clones Pitchsmith into `~/pitchsmith`, installs its dependencies on the
+first run, builds the UI, and serves the app at http://127.0.0.1:8790. Because
+the install is a git checkout, you always get the newest code, and updating
+later is one command:
 
-After the first install, launch it any time from Spotlight (⌘-Space →
-"Pitchsmith") or the Applications folder. Your data (pitches, ratings, key) is
-stored in `~/Library/Application Support/Pitchsmith`. Requires Apple Silicon.
+```bash
+cd ~/pitchsmith && ./pitchsmith update   # pull latest, rebuild, restart if running
+```
 
-> **Rebuilding the download:** `desktop/build-release.sh` regenerates the
-> self-contained `Pitchsmith.app` + zip from the current source; upload the zip
-> to the GitHub release to refresh the link above. For local development instead,
-> see **Run it** below.
+Add your Anthropic API key to `~/pitchsmith/backend/.env` to generate pitches
+(get one at console.anthropic.com). Without a key the app still runs, but only
+the deterministic audit happens — no drafts are generated. Your data (pitches,
+ratings, gold-pitch library) lives in `~/pitchsmith/backend/data`.
+
+> **Prebuilt macOS app (Apple Silicon):** `desktop/build-release.sh` regenerates
+> a self-contained `Pitchsmith.app` + zip (bundled Python, no toolchain needed);
+> upload the zip to a GitHub release to offer a double-click install. The
+> source installer above is the canonical, always-current path.
 
 ## What it does
 
 Paste an artist's bio, quotes and notes — or drop a one-sheet (`.pdf`/`.txt`) —
 and the pipeline:
 
-1. **Classifies the strategic angle** and extracts the raw material (Stage 1).
-   - **Archetype A — Worldbuilding / Sensory**: emerging artists with thin press;
-     fill the gap with concrete sensory imagery and visual anchors.
-   - **Archetype B — Authority / Thesis**: established artists with quotes,
-     co-signs, or metrics; lead with leverage and the artist's thesis.
-2. **Generates 2–3 distinct pitch options** tailored to the archetype, length,
-   and target outlet style (Stage 2).
-3. **Audits every draft** against a banned-phrase list, replacing generic
-   AI/PR clichés with concrete writing (Stage 3).
-4. **Records your edits and ratings** so future drafts learn the house voice
-   (dynamic few-shot feedback loop).
+1. **Classifies the strategic angle** and extracts the raw material — the news
+   hook and the concrete momentum (press, streaming/chart numbers, co-signs,
+   tourmates) that build the artist's credibility (Stage 1).
+   - **Archetype A — Story & Momentum**: emerging artists with thin press; lead
+     with the release and the origin story, building credibility from the ground up.
+   - **Archetype B — Authority & Press**: established artists with quotes,
+     co-signs, or numbers; lead with the strongest leverage and stack it.
+2. **Generates 2–3 distinct pitch options** in the house one-sheet voice, taught
+   by a library of gold-standard reference pitches the writer imitates (Stage 2).
+3. **Audits every draft** for AI/PR clichés; when one is flagged, the writer
+   model surgically fixes only the offending sentences, leaving the rest intact
+   (Stage 3).
+4. **Records your edits, ratings, and one-tap reject reasons** so future drafts
+   learn the house voice (gold-pitch retrieval + before/after learning loop).
 
-Everything AI degrades gracefully with no API key: the deterministic anti-AI
-audit still runs and the classifier falls back to a heuristic.
+Manage the reference pitches in the **Gold pitches** view — the single biggest
+lever on quality. Everything AI degrades gracefully with no API key: the
+deterministic cliché audit still runs and the classifier falls back to a heuristic.
 
 ## Architecture (inherited from Label OS)
 

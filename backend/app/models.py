@@ -77,10 +77,30 @@ class UserFeedback(ModelBase):
     # user-tagged genres of an edit (content, phrasing, style, grammar, facts,
     # length) so the learner attributes the change correctly
     edit_kinds: Mapped[list] = mapped_column(JSON, default=list)
+    # one-tap reasons on a rejection (strained metaphor, wrong tone, ...) — an
+    # unambiguous lesson, unlike a rating the learner has to guess the cause of
+    reject_reasons: Mapped[list] = mapped_column(JSON, default=list)
     diff_analysis: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     option: Mapped["PitchOption"] = relationship(back_populates="feedback")
+
+
+class Exemplar(ModelBase):
+    """A gold-standard pitch the writer imitates. Generation retrieves the 2-3
+    most relevant ones (archetype + tag overlap with the brief), so the voice is
+    taught by curated examples rather than accumulated rules."""
+    __tablename__ = "exemplars"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(200), default="")
+    text: Mapped[str] = mapped_column(Text, default="")
+    archetype: Mapped[str] = mapped_column(String(40), default="")
+    # short retrieval handles: genres, moods, era, "emerging artist", etc.
+    tags: Mapped[list] = mapped_column(JSON, default=list)
+    notes: Mapped[str] = mapped_column(Text, default="")  # why it's good
+    source: Mapped[str] = mapped_column(String(12), default="user")  # seed|user
+    active: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
 class HouseStyle(ModelBase):

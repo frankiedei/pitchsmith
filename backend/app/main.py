@@ -30,7 +30,8 @@ MIGRATIONS = {
     "artists": [("context", "TEXT DEFAULT ''"),
                 ("learning_summary", "JSON DEFAULT '{}'")],
     "user_feedback": [("comment", "TEXT DEFAULT ''"),
-                      ("edit_kinds", "JSON DEFAULT '[]'")],
+                      ("edit_kinds", "JSON DEFAULT '[]'"),
+                      ("reject_reasons", "JSON DEFAULT '[]'")],
 }
 
 
@@ -52,6 +53,13 @@ def migrate_columns() -> None:
 async def lifespan(app: FastAPI):
     ModelBase.metadata.create_all(engine)
     migrate_columns()
+    from .db import SessionLocal
+    from .logic import exemplars as exemplar_logic
+    db = SessionLocal()
+    try:
+        exemplar_logic.seed(db)  # the two built-in gold pitches, once
+    finally:
+        db.close()
     yield
 
 

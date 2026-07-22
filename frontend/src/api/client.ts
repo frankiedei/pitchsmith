@@ -1,6 +1,7 @@
 import type {
-  AnalyzeResponse, ArtistDetail, ArtistSummary, FeedbackStatus, GenerateParams,
-  GenerateResponse, Health, HouseRules, Insights, PitchOption, StylePreset,
+  AnalyzeResponse, ArtistDetail, ArtistSummary, ExemplarT, FeedbackStatus,
+  GenerateParams, GenerateResponse, Health, HouseRules, Insights, PitchOption,
+  StylePreset,
 } from "../types";
 
 // Inherited from LabelOS: the UI only ever calls /api/... on a configurable
@@ -71,6 +72,7 @@ export const api = {
     rating: number;
     comment: string;
     edit_kinds: string[];
+    reject_reasons: string[];
   }) =>
     req<{
       id: number; status: string; diff_analysis: Record<string, unknown>;
@@ -91,6 +93,18 @@ export const api = {
     req<Insights>(`/api/v1/artists/${artistId}/insights`, {
       method: "PUT", body: JSON.stringify({ worked, avoid }),
     }),
+
+  exemplars: () => req<ExemplarT[]>("/api/v1/exemplars"),
+  addExemplar: (payload: { title: string; text: string; notes: string }) =>
+    req<ExemplarT>("/api/v1/exemplars", {
+      method: "POST", body: JSON.stringify(payload),
+    }),
+  setExemplarActive: (id: number, active: boolean) =>
+    req<ExemplarT>(`/api/v1/exemplars/${id}`, {
+      method: "PUT", body: JSON.stringify({ active }),
+    }),
+  deleteExemplar: (id: number) =>
+    req<{ ok: boolean }>(`/api/v1/exemplars/${id}`, { method: "DELETE" }),
 
   artists: () => req<ArtistSummary[]>("/api/v1/artists"),
   artist: (id: number) => req<ArtistDetail>(`/api/v1/artists/${id}`),

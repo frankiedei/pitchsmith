@@ -93,6 +93,25 @@ export const EDIT_KINDS = [
 ] as const;
 export type EditKind = (typeof EDIT_KINDS)[number];
 
+/** One-tap reasons on a rejection — an unambiguous lesson for the learner. */
+export const REJECT_REASONS = [
+  "strained metaphor", "wrong tone", "boring opening", "too hypey",
+  "factual error", "wrong angle",
+] as const;
+
+/** A gold-standard reference pitch in the library the writer imitates. */
+export interface ExemplarT {
+  id: number;
+  title: string;
+  text: string;
+  archetype: string;
+  tags: string[];
+  notes: string;
+  source: string;
+  active: number;
+  created_at: string;
+}
+
 export interface ArtistDetail {
   id: number;
   name: string;
@@ -117,6 +136,6 @@ export interface Health {
 }
 
 export const ARCHETYPE_LABELS: Record<Archetype, string> = {
-  Archetype_A: "Worldbuilding / Sensory",
-  Archetype_B: "Authority / Thesis",
+  Archetype_A: "Story & Momentum",
+  Archetype_B: "Authority & Press",
 };

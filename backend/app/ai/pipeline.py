@@ -3,7 +3,8 @@ orchestrator, each stage a small function, deterministic guards around the AI.
 
   Stage 1  classify()  — strategy classifier & fact extractor  (cheap model)
   Stage 2  generate()  — pitch generator, 2-3 variations        (quality model)
-  Stage 3  audit()     — style & anti-AI audit                  (cheap model)
+  Stage 3  audit()     — deterministic scan; surgical self-revision by the
+                         writer model only when something is actually flagged
 
 Every stage degrades gracefully with no API key: classify falls back to a
 heuristic, generate returns a held note, audit runs deterministically.
@@ -15,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from ..config import settings
 from ..logic import audit as audit_logic
+from ..logic import exemplars as exemplar_logic
 from ..logic import feedback as feedback_logic
 from .. import models
 from . import client as ai
@@ -48,15 +50,17 @@ def classify(context: str) -> dict:
         out["archetype"] = prompts.ARCHETYPE_A
     for key in ("key_anchors", "press_quotes", "cultural_themes",
                 "comparison_artists", "sensory_motifs", "descriptors",
-                "angle_options"):
+                "angle_options", "momentum_points"):
         if not isinstance(out.get(key), list):
             out[key] = []
     out["descriptors"] = [str(d).strip() for d in out["descriptors"] if str(d).strip()]
     out["angle_options"] = [str(a).strip() for a in out["angle_options"] if str(a).strip()]
+    out["momentum_points"] = [str(m).strip() for m in out["momentum_points"] if str(m).strip()]
     out.setdefault("recommended_angle", "")
     if not out["recommended_angle"] and out["angle_options"]:
         out["recommended_angle"] = out["angle_options"][0]
     out.setdefault("artist_voice", "")
+    out.setdefault("news_hook", "")
     return out
 
 
@@ -103,6 +107,8 @@ def _heuristic_strategy(context: str) -> dict:
     established = has_quote or len(context) > 1500
     return {
         "archetype": prompts.ARCHETYPE_B if established else prompts.ARCHETYPE_A,
+        "news_hook": "",
+        "momentum_points": [],
         "key_anchors": [],
         "press_quotes": [],
         "cultural_themes": [],
@@ -125,18 +131,27 @@ def generate(db: Session, *, context: str, strategy: dict, params: dict,
     if not ai.available():
         return []
     num = max(2, min(3, int(params.get("num_options", 3))))
+    # examples teach the voice: retrieved gold exemplars set the target, the
+    # team's own before/after edits teach its taste, and past winners round it
+    # out. A contrast pair's AFTER is itself a winner, so few-shot backs off as
+    # pairs fill in — the two never carry the same pitch twice.
+    gold = exemplar_logic.block(exemplar_logic.pick(db, strategy))
+    pairs = feedback_logic.contrast_pairs(db, artist_id=artist_id)
+    n_examples = max(0, settings.feedback_examples - len(pairs))
     examples = feedback_logic.few_shot_examples(
-        db, artist_id=artist_id, archetype=strategy.get("archetype"))
-    system = prompts.GENERATOR_SYSTEM
-    block = feedback_logic.few_shot_block(examples)
-    if block:
-        system = f"{system}\n\n{block}"
-    # learning context: label-wide house rules first, then this artist's own
-    house_row = db.get(models.HouseStyle, 1)
-    learn = "\n".join(x for x in (
-        feedback_logic.house_guidance(house_row.summary if house_row else None),
-        feedback_logic.learning_guidance(learning),
+        db, artist_id=artist_id, archetype=strategy.get("archetype"),
+        exclude_texts=[p["after"] for p in pairs])[:n_examples]
+    system = "\n\n".join(x for x in (
+        prompts.GENERATOR_BASE,
+        gold,
+        feedback_logic.contrast_block(pairs),
+        feedback_logic.few_shot_block(examples),
     ) if x)
+    # learning context: house + artist rules merged and deduped into one short
+    # editor's-notes block, so overlapping lessons don't stack up in the prompt
+    house_row = db.get(models.HouseStyle, 1)
+    learn = feedback_logic.merged_guidance(
+        house_row.summary if house_row else None, learning)
     prompt = prompts.generator_prompt(
         context=context, strategy=strategy, num_options=num,
         length=params.get("length", "150-200 words"),
@@ -163,30 +178,31 @@ def generate(db: Session, *, context: str, strategy: dict, params: dict,
 # --- Stage 3 --------------------------------------------------------------
 
 def audit(draft: str, tag_phrases: list[str] | None = None) -> tuple[str, list[str]]:
-    """Scrub AI/PR clichés. Deterministic scan first (always), then an LLM rewrite
-    when a key is present. `tag_phrases` are the theme tags that must not appear
-    verbatim in the prose. Returns (polished_text, phrases_removed)."""
+    """Guard the draft, touching as little as possible. Deterministic scan first;
+    a clean draft ships with only the dash backstop applied, untouched otherwise.
+    Only when a banned phrase or a leaked theme tag is found does the WRITER model
+    (not a cheap one) surgically rewrite the offending sentences — a cheap-model
+    full rewrite is what used to shred the prose rhythm.
+    Returns (polished_text, phrases_removed)."""
     flagged = audit_logic.scan(draft)
-    # only bother the audit with tags that actually leaked into the draft
     leaked = [t for t in (tag_phrases or []) if t.lower() in draft.lower()]
+    if not flagged and not leaked:
+        return draft.strip(), []  # clean draft ships exactly as written
     if not ai.available():
-        cleaned, removed = audit_logic.strip_deterministic(draft)
-        return cleaned, removed
+        return audit_logic.strip_deterministic(draft)
     try:
         polished = ai.complete(
-            prompts.audit_prompt(draft, flagged, leaked or None),
-            model=settings.ai_audit_model,
-            system=prompts.AUDIT_SYSTEM,
+            prompts.revise_prompt(draft, flagged, leaked or None),
+            model=settings.ai_generate_model,
+            system=prompts.REVISE_SYSTEM,
             max_tokens=2000,
         ).strip()
     except Exception:
-        log.exception("audit AI call failed; falling back to deterministic strip")
+        log.exception("revision AI call failed; falling back to deterministic strip")
         polished = ""
     if not polished:  # empty rewrite — never ship worse than the deterministic strip
         return audit_logic.strip_deterministic(draft)
-    # always-on backstop: guarantee no em/en dashes ship even past the LLM audit
-    polished = audit_logic.dewatermark(polished).strip()
-    # what did the audit actually clear out?
+    # what did the revision actually clear out?
     still = set(audit_logic.scan(polished))
     removed = [p for p in flagged if p not in still]
     return polished, removed

@@ -278,6 +278,7 @@ def feedback(req: schemas.FeedbackRequest, background: BackgroundTasks,
         final_user_edited_text=final if req.status != "rejected" else "",
         rating=req.rating, comment=req.comment.strip(),
         edit_kinds=[k.strip() for k in req.edit_kinds if k.strip()][:6],
+        reject_reasons=[r.strip() for r in req.reject_reasons if r.strip()][:6],
         diff_analysis=diff)
     db.add(fb)
     db.commit()
@@ -334,6 +335,74 @@ def update_insights(artist_id: int, req: schemas.RulesUpdate,
         blurb=s.get("blurb", ""), worked=s.get("worked", []),
         avoid=s.get("avoid", []), avg_rating=s.get("avg_rating"),
         count=s.get("count"))
+
+
+# --- gold-pitch library (exemplars) ------------------------------------------
+
+@router.get("/exemplars", response_model=list[schemas.ExemplarOut])
+def exemplars(db: Session = Depends(get_db)):
+    """The gold-pitch library, newest first."""
+    return db.scalars(select(models.Exemplar)
+                      .order_by(models.Exemplar.id.desc())).all()
+
+
+@router.post("/exemplars", response_model=schemas.ExemplarOut)
+def add_exemplar(req: schemas.ExemplarIn, db: Session = Depends(get_db)):
+    """Add a reference pitch. A cheap model auto-tags it (genres, moods,
+    archetype) so retrieval can match it to future briefs; no key, no tags."""
+    text = req.text.strip()
+    if len(text) < 80:
+        raise HTTPException(400, "Paste the full pitch text (at least a paragraph).")
+    archetype, tags = "", []
+    if ai.available():
+        try:
+            out = ai.complete_json(
+                prompts.tag_exemplar_prompt(text),
+                model=pipeline.settings.ai_classify_model,
+                system=prompts.TAG_EXEMPLAR_SYSTEM, max_tokens=400)
+            # the cheap model sometimes returns a bare tag array instead of the
+            # {archetype, tags} object — accept either shape
+            raw_tags = out if isinstance(out, list) else (
+                out.get("tags") if isinstance(out, dict) else None)
+            if isinstance(out, dict) and \
+                    out.get("archetype") in (prompts.ARCHETYPE_A, prompts.ARCHETYPE_B):
+                archetype = out["archetype"]
+            tags = [str(t).strip() for t in (raw_tags or []) if str(t).strip()][:10]
+        except Exception:
+            log.exception("exemplar auto-tag failed; saving untagged")
+    # if the tagger didn't commit to an archetype, fall back to the same
+    # length/quote heuristic classify() uses, so retrieval still gets a signal
+    if not archetype:
+        archetype = pipeline._heuristic_strategy(text)["archetype"]
+    ex = models.Exemplar(title=req.title.strip(), text=text,
+                         notes=req.notes.strip(), archetype=archetype, tags=tags)
+    db.add(ex)
+    db.commit()
+    db.refresh(ex)
+    return ex
+
+
+@router.put("/exemplars/{exemplar_id}", response_model=schemas.ExemplarOut)
+def update_exemplar(exemplar_id: int, req: schemas.ExemplarUpdate,
+                    db: Session = Depends(get_db)):
+    """Toggle an exemplar in/out of retrieval without deleting it."""
+    ex = db.get(models.Exemplar, exemplar_id)
+    if ex is None:
+        raise HTTPException(404, "exemplar not found")
+    ex.active = 1 if req.active else 0
+    db.commit()
+    db.refresh(ex)
+    return ex
+
+
+@router.delete("/exemplars/{exemplar_id}")
+def delete_exemplar(exemplar_id: int, db: Session = Depends(get_db)):
+    ex = db.get(models.Exemplar, exemplar_id)
+    if ex is None:
+        raise HTTPException(404, "exemplar not found")
+    db.delete(ex)
+    db.commit()
+    return {"ok": True}
 
 
 # --- pitch hub (projects) ---------------------------------------------------

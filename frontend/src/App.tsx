@@ -3,6 +3,7 @@ import { useStore } from "./store/store";
 import { Sidebar } from "./components/Sidebar";
 import { Composer } from "./components/Composer";
 import { ArtistHub } from "./components/ArtistHub";
+import { GoldLibrary } from "./components/GoldLibrary";
 
 export default function App() {
   const { view, error, boot, toasts } = useStore();
@@ -37,7 +38,7 @@ export default function App() {
             {error}
           </div>
         )}
-        {view === "compose" ? <Composer /> : <ArtistHub />}
+        {view === "compose" ? <Composer /> : view === "gold" ? <GoldLibrary /> : <ArtistHub />}
       </main>
       <div className="toasts" aria-live="polite">
         {toasts.map((t) => (

@@ -116,6 +116,8 @@ class FeedbackRequest(BaseModel):
     comment: str = ""               # "what worked / what didn't" note
     # user-tagged genres of the edit (content, phrasing, style, grammar, ...)
     edit_kinds: list[str] = []
+    # one-tap reasons on a rejection (strained metaphor, wrong tone, ...)
+    reject_reasons: list[str] = []
 
 
 class Insights(BaseModel):
@@ -179,6 +181,32 @@ class ArtistDetail(BaseModel):
     has_context: bool = False
     insights: Insights | None = None
     pitches: list[PitchCard] = []
+
+
+# --- gold-pitch library (exemplars) ------------------------------------------
+
+class ExemplarIn(BaseModel):
+    title: str = ""
+    text: str
+    notes: str = ""
+
+
+class ExemplarUpdate(BaseModel):
+    active: bool
+
+
+class ExemplarOut(BaseModel):
+    id: int
+    title: str
+    text: str
+    archetype: str
+    tags: list[str]
+    notes: str
+    source: str
+    active: int
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
 
 
 # --- history (read) ---------------------------------------------------------
