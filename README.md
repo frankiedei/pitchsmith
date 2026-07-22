@@ -5,6 +5,31 @@ PR pitches. A **new, separate app** that inherits the Hallwood Label OS
 architecture and UI — built to be merged into the main app later, but standalone
 for now (its own `backend/` and `frontend/`, its own ports).
 
+## Install (macOS, Apple Silicon)
+
+No Python, Node, or setup — download and double-click. Paste this into Terminal:
+
+```bash
+curl -L https://github.com/frankiedei/pitchsmith/releases/latest/download/Pitchsmith-macos-arm64.zip -o /tmp/Pitchsmith.zip \
+  && ditto -x -k /tmp/Pitchsmith.zip /Applications \
+  && open /Applications/Pitchsmith.app
+```
+
+That downloads the app (~40 MB), unpacks it into Applications (~120 MB), and
+opens it. On first launch it asks for your Anthropic API key (get one at
+console.anthropic.com) — paste it then, or leave it blank and add it later.
+Quitting (⌘-Q) stops the background server. Everything it needs — a bundled
+Python, the dependencies, and the built UI — lives inside the app.
+
+After the first install, launch it any time from Spotlight (⌘-Space →
+"Pitchsmith") or the Applications folder. Your data (pitches, ratings, key) is
+stored in `~/Library/Application Support/Pitchsmith`. Requires Apple Silicon.
+
+> **Rebuilding the download:** `desktop/build-release.sh` regenerates the
+> self-contained `Pitchsmith.app` + zip from the current source; upload the zip
+> to the GitHub release to refresh the link above. For local development instead,
+> see **Run it** below.
+
 ## What it does
 
 Paste an artist's bio, quotes and notes — or drop a one-sheet (`.pdf`/`.txt`) —
