@@ -1,0 +1,9 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlalchemy>=2.0
+psycopg[binary]>=3.1   # Postgres driver (hosted); SQLite stays local
+pydantic>=2.7
+pydantic-settings>=2.3
+python-multipart>=0.0.9  # multipart form / file uploads
+pypdf>=4.2             # PDF context extraction
+anthropic>=0.40

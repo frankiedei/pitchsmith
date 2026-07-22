@@ -1,0 +1,30 @@
+# --- secrets (never commit) ---
+backend/.env
+*.env
+!backend/.env.example
+
+# --- python ---
+backend/.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- node / frontend ---
+frontend/node_modules/
+frontend/dist/
+*.local
+
+# --- local data (sqlite db + runtime state) ---
+backend/data/
+
+# --- editor / os ---
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# --- runtime logs / build cache ---
+.run/
+*.log
+*.tsbuildinfo
