@@ -5,14 +5,20 @@ Inherited shape from the Label OS backend: pydantic-settings reading a local
 degrades gracefully when no key is set — the deterministic anti-AI audit still
 runs, so the pipeline never hard-fails on a missing credential.
 """
+import os
 from pathlib import Path
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BACKEND_DIR / "data"
-DATA_DIR.mkdir(exist_ok=True)
+# PITCHSMITH_DATA_DIR lets a packaged app keep its writable state (sqlite db)
+# outside the (possibly read-only) app bundle — e.g. ~/Library/Application Support.
+DATA_DIR = Path(os.environ.get("PITCHSMITH_DATA_DIR") or (BACKEND_DIR / "data"))
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    pass  # read-only location; DATABASE_URL is expected to point elsewhere
 
 
 class Settings(BaseSettings):

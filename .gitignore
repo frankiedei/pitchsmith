@@ -33,3 +33,7 @@ backend/data/
 Pitchsmith.app/
 desktop/AppIcon.icns
 desktop/AppIcon.iconset/
+
+# --- distributable release build ---
+dist-app/
+desktop/.cache/
