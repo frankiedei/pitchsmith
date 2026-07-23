@@ -64,11 +64,14 @@ else
   if [ ! -x "$BUNDLED/bin/python3" ]; then
     say "No suitable Python found — fetching a self-contained one just for Pitchsmith…"
     curl -fsSL -o "$DIR/backend/.python.tar.gz" "$PBS_URL"
-    rm -rf "$BUNDLED"
-    tar -xzf "$DIR/backend/.python.tar.gz" -C "$DIR/backend"
+    rm -rf "$BUNDLED"; mkdir -p "$BUNDLED"
+    # the tarball unpacks to a top-level python/ dir; strip it so bin/, lib/…
+    # land directly in .python/ (i.e. .python/bin/python3 exists).
+    tar -xzf "$DIR/backend/.python.tar.gz" -C "$BUNDLED" --strip-components=1
     rm -f "$DIR/backend/.python.tar.gz"
   fi
   PYBIN="$BUNDLED/bin/python3"
+  [ -x "$PYBIN" ] || die "Could not set up a bundled Python (expected $PYBIN). Please install Python 3 from python.org and re-run."
 fi
 
 # --- backend env + deps ------------------------------------------------------
