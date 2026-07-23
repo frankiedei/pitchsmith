@@ -12,8 +12,10 @@ __pycache__/
 
 # --- node / frontend ---
 frontend/node_modules/
-frontend/dist/
 *.local
+# NOTE: frontend/dist/ is intentionally committed (built by the maintainer) so
+# end users install and update without needing Node/npm. Rebuild it with
+# `npm run build` before committing UI changes.
 
 # --- local data (sqlite db + runtime state) ---
 backend/data/
@@ -31,8 +33,9 @@ backend/data/
 
 # --- built macOS app (regenerate with desktop/make-app.sh) ---
 Pitchsmith.app/
-desktop/AppIcon.icns
 desktop/AppIcon.iconset/
+# NOTE: desktop/AppIcon.icns is committed so the installer can build the local
+# launcher .app without Pillow. Regenerate with desktop/make-icon.py.
 
 # --- distributable release build ---
 dist-app/

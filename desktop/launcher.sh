@@ -47,6 +47,23 @@ if [ ! -d frontend/dist ]; then
   ( cd frontend && npm install --silent && npm run build --silent ) || fail "Could not build the interface."
 fi
 
+# API key: ask once (or again if left blank), store it in ~/Library, and export
+# it so the backend picks it up. Empty is fine — the app still runs, it just
+# can't generate drafts until a key is added.
+KEYFILE="$HOME/Library/Application Support/Pitchsmith/apikey"
+mkdir -p "$(dirname "$KEYFILE")"
+if [ ! -s "$KEYFILE" ]; then
+  KEY=$(osascript <<'OSA' 2>/dev/null
+try
+  set r to display dialog "Welcome to Pitchsmith." & return & return & "Paste your Anthropic API key to enable pitch generation (get one at console.anthropic.com)." & return & return & "You can leave this blank and add it later." default answer "" with title "Pitchsmith" buttons {"Continue"} default button "Continue"
+  return text returned of r
+end try
+OSA
+)
+  printf '%s' "$KEY" > "$KEYFILE"
+fi
+export ANTHROPIC_API_KEY="$(cat "$KEYFILE" 2>/dev/null)"
+
 # start the backend (module path resolves from backend/)
 note "Starting Pitchsmith…"
 ( cd "$REPO/backend" && exec "$REPO/backend/.venv/bin/python" -m app.main ) >"$LOG" 2>&1 &

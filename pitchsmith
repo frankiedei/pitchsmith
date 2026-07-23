@@ -44,15 +44,23 @@ running_pid() {
   lsof -ti tcp:"$PORT" -sTCP:LISTEN 2>/dev/null | head -1 || true
 }
 
+have() { command -v "$1" >/dev/null 2>&1; }
+
 bootstrap() {
-  # first-run: create the venv + install deps if missing
+  # first-run: create the venv + install deps if missing. Prefer the system
+  # python3; fall back to the self-contained one the curl installer fetches.
   if [ ! -d backend/.venv ]; then
     say "Creating backend venv + installing deps…"
-    python3 -m venv backend/.venv
+    local py="python3"
+    have python3 || py="$ROOT/backend/.python/bin/python3"
+    [ -x "$py" ] || { warn "Python 3 not found. Install it, or use the curl installer which fetches one for you."; exit 1; }
+    "$py" -m venv backend/.venv
     ./backend/.venv/bin/pip install -q --upgrade pip
     ./backend/.venv/bin/pip install -q -r backend/requirements.txt
   fi
-  if [ ! -d frontend/node_modules ]; then
+  # The UI ships prebuilt (frontend/dist is committed), so Node is optional.
+  # Only install node deps when Node is present (a dev who will rebuild the UI).
+  if have npm && [ ! -d frontend/node_modules ]; then
     say "Installing frontend deps…"
     ( cd frontend && npm install --silent )
   fi
@@ -60,6 +68,20 @@ bootstrap() {
     cp backend/.env.example backend/.env
     warn "Created backend/.env — add ANTHROPIC_API_KEY (the deterministic audit"
     warn "still runs without one, but no pitches are generated)."
+  fi
+}
+
+# Build the UI when Node is here (a dev's fresh edits); otherwise serve the
+# prebuilt dist that ships in the repo, so end users never need Node.
+ensure_ui() {
+  if have npm; then
+    say "Building the frontend…"
+    ( cd frontend && npm run build >/dev/null )
+  elif [ -d frontend/dist ]; then
+    say "Using the prebuilt UI (frontend/dist)…"
+  else
+    warn "No Node to build the UI and no prebuilt frontend/dist. Reinstall with the curl installer."
+    return 1
   fi
 }
 
@@ -80,9 +102,7 @@ cmd_start() {
     return 0
   fi
   bootstrap
-
-  say "Building the frontend…"
-  ( cd frontend && npm run build >/dev/null )
+  ensure_ui || return 1
 
   say "Starting server on $URL"
   (
@@ -149,14 +169,15 @@ cmd_update() {
   fi
 
   say "Updating backend deps…"
-  ./backend/.venv/bin/pip install -q --upgrade -r backend/requirements.txt 2>/dev/null \
-    || { python3 -m venv backend/.venv && ./backend/.venv/bin/pip install -q -r backend/requirements.txt; }
+  ./backend/.venv/bin/pip install -q --upgrade -r backend/requirements.txt
 
-  say "Updating frontend deps…"
-  ( cd frontend && npm install --silent )
-
-  say "Rebuilding the frontend…"
-  ( cd frontend && npm run build >/dev/null )
+  # The UI comes prebuilt in the pull; only rebuild it when a dev has Node.
+  if have npm; then
+    say "Updating + rebuilding the frontend…"
+    ( cd frontend && npm install --silent && npm run build >/dev/null )
+  else
+    say "Using the prebuilt UI from the update (no Node needed)…"
+  fi
 
   ok "Update complete."
   if [ "$was_running" = "1" ]; then

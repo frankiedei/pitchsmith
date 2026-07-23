@@ -1,64 +1,111 @@
 #!/usr/bin/env bash
 # ── Pitchsmith · one-line installer ───────────────────────────────────────────
-# Fetches Pitchsmith fresh from source, builds it, and starts the local app.
+# Fetches Pitchsmith from source, sets it up, and builds a double-clickable
+# Pitchsmith.app ON THIS MACHINE (so macOS never quarantines it), then opens it.
 # Run it with:
 #
 #   curl -fsSL https://raw.githubusercontent.com/frankiedei/pitchsmith/main/install.sh | bash
 #
-# It clones (or updates) the repo into ~/pitchsmith, installs everything the
-# first run needs (a Python venv + node_modules, handled by the control CLI),
-# builds the UI, and serves the app at http://127.0.0.1:8790. Because the install
-# is a git checkout, `pitchsmith update` afterwards pulls the latest and rebuilds.
+# You do NOT need to install Node, npm, or (usually) Python: the UI ships
+# prebuilt in the repo, and if this Mac has no suitable python3 the installer
+# downloads a self-contained one just for Pitchsmith. The only requirement is
+# git (macOS offers it via the Command Line Tools on first use).
 #
-# Override the location with:  PITCHSMITH_DIR=/path/to/dir bash install.sh
+# The app is a thin launcher that runs the git checkout in ~/pitchsmith, so
+# `cd ~/pitchsmith && ./pitchsmith update` keeps every machine current.
+#
+# Override the checkout location with:  PITCHSMITH_DIR=/path bash install.sh
 set -euo pipefail
 
-REPO="https://github.com/frankiedei/pitchsmith.git"
+REPO_URL="https://github.com/frankiedei/pitchsmith.git"
 DIR="${PITCHSMITH_DIR:-$HOME/pitchsmith}"
+
+# self-contained Python, used ONLY if this Mac has no suitable python3
+PYVER="3.12.13"; PBS_TAG="20260718"
+case "$(uname -m)" in
+  arm64)  PBS_ARCH="aarch64" ;;
+  x86_64) PBS_ARCH="x86_64" ;;
+  *)      PBS_ARCH="aarch64" ;;
+esac
+PBS_URL="https://github.com/astral-sh/python-build-standalone/releases/download/${PBS_TAG}/cpython-${PYVER}%2B${PBS_TAG}-${PBS_ARCH}-apple-darwin-install_only.tar.gz"
 
 say()  { printf "\033[1;36m▶ %s\033[0m\n" "$1"; }
 warn() { printf "\033[1;33m⚠ %s\033[0m\n" "$1"; }
 ok()   { printf "\033[1;32m✓ %s\033[0m\n" "$1"; }
 die()  { printf "\033[1;31m✗ %s\033[0m\n" "$1" >&2; exit 1; }
 
-# --- prerequisites -----------------------------------------------------------
-missing=()
-for tool in git python3 node npm; do
-  command -v "$tool" >/dev/null 2>&1 || missing+=("$tool")
-done
-if [ "${#missing[@]}" -gt 0 ]; then
-  warn "Missing: ${missing[*]}"
-  echo "  Install them first. On macOS the easiest way is Homebrew (https://brew.sh):"
-  echo "    brew install git python node"
-  die "Cannot continue until the tools above are installed."
+# --- prerequisites: git only -------------------------------------------------
+if ! command -v git >/dev/null 2>&1; then
+  warn "git is required and was not found."
+  echo "  macOS can install it for you — run this, accept the prompt, then re-run:"
+  echo "    xcode-select --install"
+  die "Install git, then run the installer again."
 fi
 
 # --- clone or update ---------------------------------------------------------
 if [ -d "$DIR/.git" ]; then
-  say "Found an existing checkout at $DIR — updating it…"
-  cd "$DIR"
-  git pull --ff-only || warn "git pull skipped (local changes or diverged branch)."
+  say "Updating the existing checkout at $DIR…"
+  git -C "$DIR" pull --ff-only || warn "git pull skipped (local changes or diverged branch)."
 elif [ -e "$DIR" ]; then
-  die "$DIR exists but is not a Pitchsmith git checkout. Move it aside or set PITCHSMITH_DIR."
+  die "$DIR exists but is not a Pitchsmith checkout. Move it aside or set PITCHSMITH_DIR."
 else
   say "Cloning Pitchsmith into $DIR…"
-  git clone --depth 1 "$REPO" "$DIR"
-  cd "$DIR"
+  git clone --depth 1 "$REPO_URL" "$DIR"
+fi
+cd "$DIR"
+
+# --- a Python for the backend (system if suitable, else self-contained) ------
+PYBIN=""
+if command -v python3 >/dev/null 2>&1 \
+   && python3 -c 'import sys; raise SystemExit(0 if sys.version_info[:2] >= (3, 11) else 1)' 2>/dev/null; then
+  PYBIN="$(command -v python3)"
+else
+  BUNDLED="$DIR/backend/.python"
+  if [ ! -x "$BUNDLED/bin/python3" ]; then
+    say "No suitable Python found — fetching a self-contained one just for Pitchsmith…"
+    curl -fsSL -o "$DIR/backend/.python.tar.gz" "$PBS_URL"
+    rm -rf "$BUNDLED"
+    tar -xzf "$DIR/backend/.python.tar.gz" -C "$DIR/backend"
+    rm -f "$DIR/backend/.python.tar.gz"
+  fi
+  PYBIN="$BUNDLED/bin/python3"
 fi
 
-# --- build + start (the control CLI bootstraps the venv, node_modules, .env) --
-say "Building and starting (first run installs dependencies, this can take a minute)…"
-./pitchsmith start
+# --- backend env + deps ------------------------------------------------------
+if [ ! -d backend/.venv ]; then
+  say "Setting up the backend (first run installs dependencies)…"
+  "$PYBIN" -m venv backend/.venv
+fi
+backend/.venv/bin/python -m pip install -q --upgrade pip
+backend/.venv/bin/python -m pip install -q -r backend/requirements.txt
+[ -f backend/.env ] || cp backend/.env.example backend/.env
 
-ok "Pitchsmith is installed at $DIR"
-echo
-echo "  Open it:     http://127.0.0.1:8790"
-echo "  Update it:   cd \"$DIR\" && ./pitchsmith update"
-echo "  Stop it:     cd \"$DIR\" && ./pitchsmith stop"
-echo
-echo "Add your Anthropic API key to $DIR/backend/.env to generate pitches"
-echo "(get one at console.anthropic.com). Without a key the app still runs, but"
-echo "the deterministic audit is all that happens — no drafts are generated."
+# The UI ships prebuilt in the repo, so no Node/npm is needed. Guard against a
+# checkout that somehow lacks it.
+[ -d frontend/dist ] || die "frontend/dist is missing from the checkout — the prebuilt UI should be committed."
 
-# open the browser on macOS
-command -v open >/dev/null 2>&1 && open "http://127.0.0.1:8790" 2>/dev/null || true
+# --- build the double-click launcher locally (never quarantined) -------------
+say "Building the Pitchsmith app…"
+( cd desktop && ./make-app.sh >/dev/null )        # produces "$DIR/Pitchsmith.app"
+
+APPS="/Applications"; [ -w "$APPS" ] || APPS="$HOME/Applications"
+mkdir -p "$APPS"
+rm -rf "$APPS/Pitchsmith.app"
+cp -R "$DIR/Pitchsmith.app" "$APPS/Pitchsmith.app"
+
+ok "Installed Pitchsmith.app to $APPS"
+say "Opening it now…"
+open "$APPS/Pitchsmith.app" 2>/dev/null || true
+
+cat <<EOF
+
+  Double-click Pitchsmith in $APPS (or Spotlight: ⌘-Space → Pitchsmith) any time.
+  It opens the app at http://127.0.0.1:8790 in your browser and stops when you quit.
+
+  Update to the latest any time:   cd "$DIR" && ./pitchsmith update
+  Uninstall:                       rm -rf "$DIR" "$APPS/Pitchsmith.app"
+
+Add your Anthropic API key in the app's first-run prompt, or in $DIR/backend/.env,
+to generate pitches (get one at console.anthropic.com). Without a key the app
+still runs, but only the deterministic audit happens — no drafts are generated.
+EOF

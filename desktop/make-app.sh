@@ -11,11 +11,19 @@ PY="${PYTHON:-python3}"
 
 say() { printf "\033[1;36m▶ %s\033[0m\n" "$1"; }
 
-say "Building the icon…"
-"$PY" - <<'CHECK' || { echo "Pillow is needed: pip3 install --user Pillow"; exit 1; }
-import PIL  # noqa
-CHECK
-"$PY" make-icon.py pitchsmith-logo.png "$HERE/AppIcon.icns"
+# Use the committed icon when it's present (the common case, and the one the
+# installer relies on so it needs no Pillow). Only regenerate from the PNG when
+# the icon is missing AND Pillow is available.
+ICON="$HERE/AppIcon.icns"
+if [ ! -f "$ICON" ]; then
+  if "$PY" -c "import PIL" >/dev/null 2>&1; then
+    say "Building the icon…"
+    "$PY" make-icon.py pitchsmith-logo.png "$ICON"
+  else
+    say "No AppIcon.icns and no Pillow — building the app without a custom icon."
+    ICON=""
+  fi
+fi
 
 say "Assembling $APP…"
 rm -rf "$APP"
@@ -24,7 +32,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 # launcher: inject the absolute repo path so the app works from /Applications
 sed "s|__REPO__|$REPO|g" launcher.sh > "$APP/Contents/MacOS/Pitchsmith"
 chmod +x "$APP/Contents/MacOS/Pitchsmith"
-cp AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+[ -n "$ICON" ] && cp "$ICON" "$APP/Contents/Resources/AppIcon.icns"
 
 cat > "$APP/Contents/Info.plist" <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -47,7 +55,6 @@ PLIST
 
 # refresh Finder's icon cache so the new icon shows immediately
 touch "$APP"
-rm -f "$HERE/AppIcon.icns"
 
 say "Done: $APP"
 
