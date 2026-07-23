@@ -7,17 +7,26 @@ for now (its own `backend/` and `frontend/`, its own ports).
 
 ## Install (one line, always the latest)
 
-Paste this into Terminal to fetch the newest version from source, build it, and
-open it. Needs `git`, `python3`, and `node` (on macOS: `brew install git python node`):
+Pitchsmith installs and updates from source, the same way Hallwood Label OS does:
+a git checkout you run locally with a couple of scripts. Nothing is downloaded as
+an app bundle, so macOS never quarantines it and every machine stays current with
+one command. Needs `git`, `python3`, and `node` (on macOS: `brew install git python node`):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/frankiedei/pitchsmith/main/install.sh | bash
 ```
 
 That clones Pitchsmith into `~/pitchsmith`, installs its dependencies on the
-first run, builds the UI, and serves the app at http://127.0.0.1:8790. Because
-the install is a git checkout, you always get the newest code, and updating
-later is one command:
+first run, builds the UI, and serves the app at http://127.0.0.1:8790. Prefer to
+see what runs before running it? Do the same thing by hand:
+
+```bash
+git clone https://github.com/frankiedei/pitchsmith.git ~/pitchsmith
+cd ~/pitchsmith && ./pitchsmith start
+```
+
+Because the install is a git checkout, you always get the newest code, and every
+machine updates with one command:
 
 ```bash
 cd ~/pitchsmith && ./pitchsmith update   # pull latest, rebuild, restart if running
@@ -26,12 +35,25 @@ cd ~/pitchsmith && ./pitchsmith update   # pull latest, rebuild, restart if runn
 Add your Anthropic API key to `~/pitchsmith/backend/.env` to generate pitches
 (get one at console.anthropic.com). Without a key the app still runs, but only
 the deterministic audit happens — no drafts are generated. Your data (pitches,
-ratings, gold-pitch library) lives in `~/pitchsmith/backend/data`.
+ratings, gold-pitch library) lives in `~/pitchsmith/backend/data` and survives
+every update.
 
-> **Prebuilt macOS app (Apple Silicon):** `desktop/build-release.sh` regenerates
-> a self-contained `Pitchsmith.app` + zip (bundled Python, no toolchain needed);
-> upload the zip to a GitHub release to offer a double-click install. The
-> source installer above is the canonical, always-current path.
+The `./pitchsmith` control script is the whole interface:
+
+| Command | What it does |
+|---|---|
+| `./pitchsmith start` | Build the UI + run one server (UI + API) in the background → `:8790` |
+| `./pitchsmith update` | `git pull`, reinstall deps, rebuild, restart if it was running |
+| `./pitchsmith stop` / `restart` / `status` | Manage the background server |
+| `./pitchsmith dev` | Foreground live-reload (backend `:8790` + Vite `:5174`) |
+| `./pitchsmith logs` | Tail the server log |
+
+> **Why not a `.app` download?** A double-click `Pitchsmith.app` is unsigned, so
+> macOS Gatekeeper quarantines it on every machine but the one that built it
+> ("can't be opened / from an unidentified developer"). The source install above
+> avoids that entirely and is the supported path. If you *do* build one locally
+> with `desktop/build-release.sh` and copy it to another Mac, clear the flag once
+> with `xattr -dr com.apple.quarantine /Applications/Pitchsmith.app`.
 
 ## What it does
 
@@ -90,24 +112,11 @@ pitchsmith/
 
 ## Run it
 
-Use the `pitchsmith` control CLI (bootstraps the venv + node_modules on first run):
-
-```bash
-cd pitchsmith
-cp backend/.env.example backend/.env   # add ANTHROPIC_API_KEY
-
-./pitchsmith start      # build the UI + run the server in the background → :8790
-./pitchsmith stop       # stop the server
-./pitchsmith restart    # stop, then start
-./pitchsmith update     # pull latest, reinstall deps, rebuild, restart if running
-./pitchsmith status     # is it running? where?
-./pitchsmith dev        # foreground live-reload (backend :8790 + Vite :5174)
-./pitchsmith logs       # tail the server log
-```
-
-`start` serves the built UI **and** the API from one process on
-`http://127.0.0.1:8790` — closest to how a packaged build behaves. Use `dev`
-for live-reload while editing the frontend.
+The `./pitchsmith` control script (see the table under **Install**) is the whole
+interface — `start` bootstraps the venv + `node_modules` on first run, then
+serves the built UI **and** the API from one process on `http://127.0.0.1:8790`,
+closest to how a packaged build behaves. Use `./pitchsmith dev` for live-reload
+while editing the frontend.
 
 To run it as a bare `pitchsmith` command from anywhere, put it on your PATH once:
 
