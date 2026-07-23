@@ -34,6 +34,13 @@ warn() { printf "\033[1;33m⚠ %s\033[0m\n" "$1"; }
 ok()   { printf "\033[1;32m✓ %s\033[0m\n" "$1"; }
 die()  { printf "\033[1;31m✗ %s\033[0m\n" "$1" >&2; exit 1; }
 
+# --- this installer builds a macOS app; it only makes sense on a Mac ---------
+# (Linux cloud shells / CI terminals can't run a .app — run this on the actual
+# Mac you want Pitchsmith on.)
+if [ "$(uname -s)" != "Darwin" ]; then
+  die "Pitchsmith's installer builds a macOS app and must be run on a Mac (not a Linux or cloud terminal). Open Terminal on the Mac you want to use, and run it there."
+fi
+
 # --- prerequisites: git only -------------------------------------------------
 if ! command -v git >/dev/null 2>&1; then
   warn "git is required and was not found."
