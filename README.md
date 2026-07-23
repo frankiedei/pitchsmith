@@ -5,55 +5,55 @@ PR pitches. A **new, separate app** that inherits the Hallwood Label OS
 architecture and UI — built to be merged into the main app later, but standalone
 for now (its own `backend/` and `frontend/`, its own ports).
 
-## Install (one line, always the latest)
+## Install (one line — a double-click app, no quarantine)
 
-Pitchsmith installs and updates from source, the same way Hallwood Label OS does:
-a git checkout you run locally with a couple of scripts. Nothing is downloaded as
-an app bundle, so macOS never quarantines it and every machine stays current with
-one command. Needs `git`, `python3`, and `node` (on macOS: `brew install git python node`):
+Paste this into Terminal. It sets everything up and leaves a **Pitchsmith app in
+your Applications** that you double-click to open the UI in your browser:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/frankiedei/pitchsmith/main/install.sh | bash
 ```
 
-That clones Pitchsmith into `~/pitchsmith`, installs its dependencies on the
-first run, builds the UI, and serves the app at http://127.0.0.1:8790. Prefer to
-see what runs before running it? Do the same thing by hand:
+You do **not** need to install Node, npm, or (usually) Python. The installer
+clones Pitchsmith into `~/pitchsmith`, uses your system Python or downloads a
+self-contained one if you don't have it, and then **builds `Pitchsmith.app` on
+your own machine** — so macOS never quarantines it and there's no "unidentified
+developer" wall or `xattr` step. The only requirement is `git` (macOS offers to
+install it the first time you use it).
+
+After that, double-click **Pitchsmith** in Applications (or Spotlight: ⌘-Space →
+Pitchsmith) any time. It runs a local server and opens
+http://127.0.0.1:8790 in your default browser, and stops when you quit.
+
+The app is a thin launcher over the git checkout, so every machine updates to the
+latest with one command:
 
 ```bash
-git clone https://github.com/frankiedei/pitchsmith.git ~/pitchsmith
-cd ~/pitchsmith && ./pitchsmith start
+cd ~/pitchsmith && ./pitchsmith update
 ```
 
-Because the install is a git checkout, you always get the newest code, and every
-machine updates with one command:
+On first launch the app asks for your Anthropic API key (get one at
+console.anthropic.com); leave it blank to add later. Without a key the app still
+runs, but only the deterministic audit happens — no drafts are generated. Your
+data (pitches, ratings, gold-pitch library) lives in `~/pitchsmith/backend/data`
+and survives every update.
 
-```bash
-cd ~/pitchsmith && ./pitchsmith update   # pull latest, rebuild, restart if running
-```
-
-Add your Anthropic API key to `~/pitchsmith/backend/.env` to generate pitches
-(get one at console.anthropic.com). Without a key the app still runs, but only
-the deterministic audit happens — no drafts are generated. Your data (pitches,
-ratings, gold-pitch library) lives in `~/pitchsmith/backend/data` and survives
-every update.
-
-The `./pitchsmith` control script is the whole interface:
+Prefer to run it from the terminal instead of the app? The `./pitchsmith` control
+script does everything (no Node needed — the UI ships prebuilt):
 
 | Command | What it does |
 |---|---|
-| `./pitchsmith start` | Build the UI + run one server (UI + API) in the background → `:8790` |
-| `./pitchsmith update` | `git pull`, reinstall deps, rebuild, restart if it was running |
+| `./pitchsmith start` | Run one server (UI + API) in the background → `:8790` |
+| `./pitchsmith update` | `git pull` the latest, refresh deps, restart if running |
 | `./pitchsmith stop` / `restart` / `status` | Manage the background server |
-| `./pitchsmith dev` | Foreground live-reload (backend `:8790` + Vite `:5174`) |
+| `./pitchsmith dev` | Foreground live-reload (needs Node; backend `:8790` + Vite `:5174`) |
 | `./pitchsmith logs` | Tail the server log |
 
-> **Why not a `.app` download?** A double-click `Pitchsmith.app` is unsigned, so
-> macOS Gatekeeper quarantines it on every machine but the one that built it
-> ("can't be opened / from an unidentified developer"). The source install above
-> avoids that entirely and is the supported path. If you *do* build one locally
-> with `desktop/build-release.sh` and copy it to another Mac, clear the flag once
-> with `xattr -dr com.apple.quarantine /Applications/Pitchsmith.app`.
+> **Why it's never quarantined:** the `.app` is generated locally by the
+> installer, not downloaded as a bundle, so it carries no `com.apple.quarantine`
+> flag. (The old prebuilt-`.app` GitHub release *was* quarantined for exactly
+> that reason and is deprecated in favor of this installer.) Because the UI is
+> committed prebuilt, `./pitchsmith update` also needs no Node.
 
 ## What it does
 
