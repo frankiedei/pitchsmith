@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build Pitchsmith.app — a double-clickable macOS app that runs Pitchsmith with
+# Build Pitchsmith.app - a double-clickable macOS app that runs Pitchsmith with
 # no terminal. Re-run any time; it rebuilds the bundle in place. Pass --install
 # to also copy it into /Applications.
 set -euo pipefail
@@ -9,7 +9,7 @@ HERE="$(pwd)"
 APP="$REPO/Pitchsmith.app"
 PY="${PYTHON:-python3}"
 
-say() { printf "\033[1;36m▶ %s\033[0m\n" "$1"; }
+say() { printf "\033[1;36m> %s\033[0m\n" "$1"; }
 
 # Use the committed icon when it's present (the common case, and the one the
 # installer relies on so it needs no Pillow). Only regenerate from the PNG when
@@ -17,15 +17,15 @@ say() { printf "\033[1;36m▶ %s\033[0m\n" "$1"; }
 ICON="$HERE/AppIcon.icns"
 if [ ! -f "$ICON" ]; then
   if "$PY" -c "import PIL" >/dev/null 2>&1; then
-    say "Building the icon…"
+    say "Building the icon..."
     "$PY" make-icon.py pitchsmith-logo.png "$ICON"
   else
-    say "No AppIcon.icns and no Pillow — building the app without a custom icon."
+    say "No AppIcon.icns and no Pillow - building the app without a custom icon."
     ICON=""
   fi
 fi
 
-say "Assembling $APP…"
+say "Assembling $APP..."
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
@@ -59,8 +59,8 @@ touch "$APP"
 say "Done: $APP"
 
 if [ "${1:-}" = "--install" ]; then
-  say "Installing to /Applications…"
+  say "Installing to /Applications..."
   rm -rf "/Applications/Pitchsmith.app"
   cp -R "$APP" "/Applications/Pitchsmith.app"
-  say "Installed. Open it from Applications or Spotlight (⌘-Space → Pitchsmith)."
+  say "Installed. Open it from Applications or Spotlight (Cmd-Space -> Pitchsmith)."
 fi

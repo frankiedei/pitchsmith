@@ -17,24 +17,24 @@ CACHE="$PWD/.cache"
 PYVER="3.12.13"; PBS_TAG="20260718"
 PBS_URL="https://github.com/astral-sh/python-build-standalone/releases/download/${PBS_TAG}/cpython-${PYVER}%2B${PBS_TAG}-aarch64-apple-darwin-install_only.tar.gz"
 
-say() { printf "\033[1;36m▶ %s\033[0m\n" "$1"; }
+say() { printf "\033[1;36m> %s\033[0m\n" "$1"; }
 
 mkdir -p "$CACHE" "$OUT"
 
-say "Building the icon…"
+say "Building the icon..."
 python3 make-icon.py pitchsmith-logo.png "$CACHE/AppIcon.icns"
 
-say "Building the UI…"
+say "Building the UI..."
 ( cd "$REPO/frontend" && npm install --silent && npm run build --silent )
 
 if [ ! -x "$CACHE/python/bin/python3" ]; then
-  say "Fetching bundled Python (one-time, cached)…"
+  say "Fetching bundled Python (one-time, cached)..."
   curl -sL -o "$CACHE/python.tar.gz" "$PBS_URL"
   rm -rf "$CACHE/python"
   tar -xzf "$CACHE/python.tar.gz" -C "$CACHE"
 fi
 
-say "Assembling $APP…"
+say "Assembling $APP..."
 rm -rf "$APP"
 mkdir -p "$RES/app/backend" "$RES/app/frontend" "$APP/Contents/MacOS"
 
@@ -75,7 +75,7 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
 PLIST
 touch "$APP"
 
-say "Zipping (ditto, preserves the bundled symlinks)…"
+say "Zipping (ditto, preserves the bundled symlinks)..."
 rm -f "$ZIP"
 ( cd "$OUT" && ditto -c -k --sequesterRsrc --keepParent "Pitchsmith.app" "$ZIP" )
 

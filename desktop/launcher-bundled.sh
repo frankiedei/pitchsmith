@@ -2,7 +2,7 @@
 # Self-contained Pitchsmith.app launcher. Everything it needs (Python, deps,
 # built UI) lives inside the bundle; user data lives in ~/Library. No system
 # Python, Node, or terminal required.
-BUNDLE="$(cd "$(dirname "$0")/../.." && pwd)"     # …/Pitchsmith.app
+BUNDLE="$(cd "$(dirname "$0")/../.." && pwd)"     # .../Pitchsmith.app
 RES="$BUNDLE/Contents/Resources"
 APP="$RES/app"
 PY="$RES/python/bin/python3"
@@ -49,7 +49,7 @@ export PITCHSMITH_DATA_DIR="$DATA"
 export DATABASE_URL="sqlite:////${DATA}/pitchsmith.db"
 export ANTHROPIC_API_KEY="$(cat "$KEYFILE" 2>/dev/null)"
 
-note "Starting Pitchsmith…"
+note "Starting Pitchsmith..."
 ( cd "$APP/backend" && exec "$PY" -m app.main ) >"$LOG" 2>&1 &
 BACK=$!
 

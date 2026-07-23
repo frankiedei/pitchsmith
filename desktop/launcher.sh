@@ -1,5 +1,5 @@
 #!/bin/bash
-# Pitchsmith.app launcher — starts the backend, opens the UI in an app window,
+# Pitchsmith.app launcher - starts the backend, opens the UI in an app window,
 # and stops the backend when you quit the app. No terminal required.
 # __REPO__ is filled in by make-app.sh at build time.
 REPO="__REPO__"
@@ -33,7 +33,7 @@ cd "$REPO" || fail "Could not open $REPO"
 
 # first-run setup (skipped once installed): venv, deps, built UI
 if [ ! -d backend/.venv ] || [ ! -d frontend/dist ]; then
-  note "First run: setting things up, this takes a minute…"
+  note "First run: setting things up, this takes a minute..."
 fi
 if [ ! -d backend/.venv ]; then
   command -v python3 >/dev/null 2>&1 || fail "Python 3 is required but was not found. Install it from python.org, then reopen Pitchsmith."
@@ -48,7 +48,7 @@ if [ ! -d frontend/dist ]; then
 fi
 
 # API key: ask once (or again if left blank), store it in ~/Library, and export
-# it so the backend picks it up. Empty is fine — the app still runs, it just
+# it so the backend picks it up. Empty is fine - the app still runs, it just
 # can't generate drafts until a key is added.
 KEYFILE="$HOME/Library/Application Support/Pitchsmith/apikey"
 mkdir -p "$(dirname "$KEYFILE")"
@@ -65,11 +65,11 @@ fi
 export ANTHROPIC_API_KEY="$(cat "$KEYFILE" 2>/dev/null)"
 
 # start the backend (module path resolves from backend/)
-note "Starting Pitchsmith…"
+note "Starting Pitchsmith..."
 ( cd "$REPO/backend" && exec "$REPO/backend/.venv/bin/python" -m app.main ) >"$LOG" 2>&1 &
 BACK=$!
 
-# quit → stop the backend
+# quit -> stop the backend
 cleanup() { kill "$BACK" 2>/dev/null; wait "$BACK" 2>/dev/null; exit 0; }
 trap cleanup TERM INT
 
