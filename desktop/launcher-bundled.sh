@@ -11,19 +11,13 @@ URL="http://127.0.0.1:${PORT}"
 DATA="$HOME/Library/Application Support/Pitchsmith"
 KEYFILE="$DATA/apikey"
 LOG="$HOME/Library/Logs/Pitchsmith.log"
-CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-EDGE="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
-
 note() { osascript -e "display notification \"$1\" with title \"Pitchsmith\"" >/dev/null 2>&1; }
 fail() {
   osascript -e "display dialog \"$1\" with title \"Pitchsmith\" buttons {\"OK\"} default button \"OK\" with icon stop" >/dev/null 2>&1
   exit 1
 }
-open_window() {
-  if [ -x "$CHROME" ]; then "$CHROME" --app="$URL" >/dev/null 2>&1 &
-  elif [ -x "$EDGE" ]; then "$EDGE" --app="$URL" >/dev/null 2>&1 &
-  else open "$URL"; fi
-}
+# open the localhost URL as a normal tab in the default browser
+open_window() { open "$URL"; }
 
 mkdir -p "$DATA"
 

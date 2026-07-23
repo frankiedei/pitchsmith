@@ -1,13 +1,11 @@
 #!/bin/bash
-# Pitchsmith.app launcher - starts the backend, opens the UI in an app window,
-# and stops the backend when you quit the app. No terminal required.
-# __REPO__ is filled in by make-app.sh at build time.
+# Pitchsmith.app launcher - starts the backend, opens the UI as a localhost tab
+# in your default browser, and stops the backend when you quit the app. No
+# terminal required. __REPO__ is filled in by make-app.sh at build time.
 REPO="__REPO__"
 PORT=8790
 URL="http://127.0.0.1:${PORT}"
 LOG="$HOME/Library/Logs/Pitchsmith.log"
-CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-EDGE="/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
 
 note() { osascript -e "display notification \"$1\" with title \"Pitchsmith\"" >/dev/null 2>&1; }
 fail() {
@@ -15,12 +13,9 @@ fail() {
   exit 1
 }
 
-open_window() {
-  # a chromeless app window feels native; fall back to the default browser
-  if [ -x "$CHROME" ]; then "$CHROME" --app="$URL" >/dev/null 2>&1 &
-  elif [ -x "$EDGE" ]; then "$EDGE" --app="$URL" >/dev/null 2>&1 &
-  else open "$URL"; fi
-}
+# open the localhost URL as a normal tab in the default browser (no separate
+# chromeless app window)
+open_window() { open "$URL"; }
 
 # already up (e.g. started elsewhere)? just open the window and finish.
 if curl -s -m 2 "$URL/api/v1/health" >/dev/null 2>&1; then

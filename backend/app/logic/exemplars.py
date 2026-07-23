@@ -6,13 +6,20 @@ exemplar by archetype match + word overlap between its tags/title/notes and the
 brief's descriptors and motifs, take the top 2-3. No embeddings needed at this
 scale; revisit if the library ever passes a few hundred entries.
 """
+import json
 import re
+from pathlib import Path
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..ai import prompts
 from .. import models
+
+# The committed gold-pitch library — the versioned source of truth so every
+# download/clone seeds the SAME curated set. Regenerate it from the current DB
+# with backend/export_seed_exemplars.py, then commit it.
+_SEED_FILE = Path(__file__).with_name("seed_exemplars.json")
 
 _STOP = {
     "the", "a", "an", "and", "or", "of", "to", "in", "on", "for", "with",
@@ -28,10 +35,9 @@ def _tokens(*chunks: str) -> set[str]:
     return out
 
 
-# The seven house-reference pitches, with hand-written retrieval tags. A = Story
-# & Momentum (emerging, leads with release + origin), B = Authority & Press
-# (established, leads with heavy press/co-signs/numbers).
-_SEED_EXEMPLARS = [
+# Fallback built-in set, used only if seed_exemplars.json is missing/unreadable.
+# The JSON (loaded by _load_seed_specs) is the real, shippable source of truth.
+_FALLBACK_SEED_EXEMPLARS = [
     dict(title="Sophia Stel — Molly In The Club (house reference)",
          text=prompts.GOLD_PITCH_1, archetype=prompts.ARCHETYPE_B,
          tags=["hyperpop", "diy pop", "y2k", "self-produced", "heavy press",
@@ -77,12 +83,38 @@ _SEED_EXEMPLARS = [
 ]
 
 
+def _load_seed_specs() -> list[dict]:
+    """The gold pitches to seed, from the committed JSON (source of truth). Falls
+    back to the built-in list if the file is missing or unreadable."""
+    try:
+        data = json.loads(_SEED_FILE.read_text(encoding="utf-8"))
+        specs: list[dict] = []
+        for d in data:
+            text = str(d.get("text", "")).strip()
+            if not text:
+                continue
+            arch = d.get("archetype")
+            specs.append(dict(
+                title=str(d.get("title", "")).strip(),
+                text=text,
+                archetype=arch if arch in (prompts.ARCHETYPE_A, prompts.ARCHETYPE_B) else "",
+                tags=[str(t).strip() for t in (d.get("tags") or []) if str(t).strip()],
+                notes=str(d.get("notes", "")).strip(),
+            ))
+        if specs:
+            return specs
+    except Exception:
+        pass
+    return _FALLBACK_SEED_EXEMPLARS
+
+
 def seed(db: Session) -> None:
     """Insert the built-in gold pitches when the library is empty, so retrieval
-    and the manage-UI always have something to show."""
+    and the manage-UI always have something to show. The set is the committed
+    seed_exemplars.json, so every download gets the same curated library."""
     if db.scalar(select(models.Exemplar.id).limit(1)) is not None:
         return
-    for spec in _SEED_EXEMPLARS:
+    for spec in _load_seed_specs():
         db.add(models.Exemplar(source="seed", **spec))
     db.commit()
 
